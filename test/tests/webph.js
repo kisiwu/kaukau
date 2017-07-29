@@ -5,7 +5,6 @@ var expect = kaukau.expect;
 var parameters = kaukau.Configurator.parameters;
 var Debug = kaukau.Logger.info;
 
-
 describe('Route 1', function() {
 
   //considered slow when ...
