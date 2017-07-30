@@ -3,6 +3,7 @@ var request = require('request');
 
 var expect = kaukau.expect;
 var parameters = kaukau.Configurator.parameters;
+var Tester = kaukau.Tester;
 var Debug = kaukau.Logger.info;
 
 describe('Route 1', function() {
@@ -11,13 +12,13 @@ describe('Route 1', function() {
   this.slow(290);
 
   it('status should be 200', (done) => {
-    request({
+    Tester.request({
       method: 'GET',
       url: parameters.host+'/webhp'
     }, (err, res, body) => {
       expect(err).to.equal(null);
       expect(res.statusCode).to.equal(200);
-      //Debug(body);
+      Debug(res.statusCode);
       done();
     });
   });
