@@ -1,6 +1,8 @@
 var Kaukau = require('../index');
 var Logger = Kaukau.Logger;
 
+Logger.indent(5);
+
 //Logger.off();
 
 var kaukau = new Kaukau(
@@ -52,7 +54,7 @@ var kaukau = new Kaukau(
 kaukau.run()
 .on('done', function(){
   //Logger.on();
-  Logger.info("ALL DONE");
+  Logger.tab(3).info("ALL DONE");
 })
 .on('fail', function(test){
   //Logger.on();

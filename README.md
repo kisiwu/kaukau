@@ -1,2 +1,2 @@
 # kaukau
-JS test tools
+JS test tools, Mocha wrapper

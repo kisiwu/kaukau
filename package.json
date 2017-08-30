@@ -1,8 +1,8 @@
 {
   "name": "kaukau",
   "private": false,
-  "version": "0.0.3",
-  "description": "JS test tools",
+  "version": "0.0.4",
+  "description": "JS test tools, Mocha wrapper",
   "main": "index.js",
   "repository": {
     "type": "git",
