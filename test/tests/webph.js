@@ -9,7 +9,7 @@ var Debug = kaukau.Logger.info;
 describe('Route 1', function() {
 
   //considered slow when ...
-  this.slow(290);
+  /*this.slow(290);
 
   it('status should be 200', (done) => {
     Tester.request({
@@ -21,5 +21,16 @@ describe('Route 1', function() {
       Debug(res.statusCode);
       done();
     });
+  });*/
+
+  Tester.save({
+    method: 'GET',
+    url: parameters.host+'/webhp'
+  });
+
+  it('status should be 200', function(){
+    expect(this.err).to.equal(null);
+    expect(this.res.statusCode).to.equal(200);
+    Debug(this.res.statusCode);
   });
 });
