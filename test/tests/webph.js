@@ -1,8 +1,9 @@
 var kaukau = require('../../lib/kaukau');
 var request = require('request');
 
-var expect = kaukau.expect;
-var parameters = kaukau.Configurator.parameters;
+var expect = require('chai').expect;
+//var parameters = kaukau.Configurator.parameters;
+var Parameters = kaukau.Parameters;
 var Tester = kaukau.Tester;
 var Debug = kaukau.Logger.info;
 
@@ -25,7 +26,7 @@ describe('Route 1', function() {
 
   Tester.save({
     method: 'GET',
-    url: parameters.host+'/webhp'
+    url: Parameters('host')+'/webhp'
   });
 
   it('status should be 200', function(){
