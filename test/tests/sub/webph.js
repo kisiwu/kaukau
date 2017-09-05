@@ -1,4 +1,4 @@
-var kaukau = require('../../lib/kaukau');
+var kaukau = require('../../../lib/kaukau');
 var request = require('request');
 
 var expect = require('chai').expect;
@@ -32,6 +32,6 @@ describe('Route 1', function() {
   it('status should be 200', function(){
     expect(this.err).to.equal(null);
     expect(this.res.statusCode).to.equal(200);
-    Debug(this.res.statusCode);
+    Debug("sub1", Parameters('credentials.email'),this.res.statusCode);
   });
 });

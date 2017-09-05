@@ -29,8 +29,13 @@ var kaukau = new Kaukau(
           "reporterOptions": {
             "reportDir": "logs/reports",
             "reportFilename": "wikipedia",
-            "enableCharts": false
+            "enableCharts": false,
           }
+        },
+        "kaukauOptions": {
+          "files": [
+            "sub"
+          ]
         }
       },
       {
