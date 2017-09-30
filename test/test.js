@@ -10,7 +10,7 @@ var kaukau = new Kaukau(
     "directory": "test/tests",
     "first": "login.js",
     "last": "logout.js",
-    "enableLogs": false,
+    "enableLogs": true,
     "exitOnFail": false,
     "options": {
       "useColors": true,
