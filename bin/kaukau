@@ -1,3 +1,4 @@
+#! /usr/bin/env node
 var logger = require('../lib/logger');
 
 logger.warn("'kaukau' command line not yet implemented !");
