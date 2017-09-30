@@ -9,7 +9,7 @@
     "url": "https://github.com/kisiwu/kaukau.git"
   },
   "scripts": {
-    "test": "make test"
+    "test": "node ./test/test.js"
   },
   "bin": {
     "kaukau": "bin/kaukau"
