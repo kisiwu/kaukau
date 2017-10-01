@@ -1,4 +1,134 @@
 #! /usr/bin/env node
-var logger = require('../lib/logger');
 
-logger.warn("'kaukau' command line not yet implemented !");
+var fs = require('fs');
+var path = require('path');
+var Kaukau = require('..');
+var logger = require('../lib/logger');
+var options = {};
+
+logger.warn("'kaukau' command line is still in development !")
+
+var directory = ""
+var enableLogs, exitOnFail, silent;
+var requiredModules = "";
+
+/**
+* --require module1,module2,...
+*/
+requiredModules = process.argv.indexOf('--require') === -1
+    ? requiredModules
+    : process.argv[process.argv.indexOf('--require') + 1] || ""
+requiredModules = requiredModules.split(",")
+
+/**
+* -d test
+*/
+directory = process.argv.indexOf('-d') === -1
+    ? directory
+    : path.join( directory , (process.argv[process.argv.indexOf('-d') + 1] || ""))
+
+/**
+* --logs
+*/
+enableLogs = process.argv.indexOf('--logs') === -1
+    ? false
+    : true
+/**
+* -exit-on-fail
+*/
+exitOnFail = process.argv.indexOf('-exit-on-fail') === -1
+    ? false
+    : true
+
+/**
+* --logs
+*/
+silent = process.argv.indexOf('--silent') === -1
+    ? false
+    : true
+
+options['directory'] = directory
+options['enableLogs'] = enableLogs
+options['exitOnFail'] = exitOnFail
+
+
+/**
+* handle cmd options values
+*/
+
+if(silent)
+    logger.off();
+
+//logger.info("-d", directory)
+
+requiredModules.forEach(
+function(mod){
+logger.info("--require", mod)
+require(mod)
+}
+);
+
+
+var parametersDir = 'parameters/kaukau';
+
+// if flag 'project', concat it's value to paramaters dirname to get the parameters sets to import
+parametersDir = process.argv.indexOf('--parameters') === -1
+    ? parametersDir
+    : process.argv[process.argv.indexOf('--parameters') + 1] || parametersDir;
+
+//logger.info("--parameters", parametersDir)
+
+var walkSync = function(dir, filelist, subdir) {
+  subdir = subdir || "";
+  var files = fs.readdirSync(dir);
+  filelist = filelist || [];
+  files.forEach(function(file) {
+    if (fs.statSync(path.join(dir, file)).isDirectory()) {
+      filelist = walkSync(path.join(dir, file), filelist, path.join(subdir, file));
+    }
+    else {
+      filelist.push(path.join(subdir, file));
+    }
+  });
+  return filelist;
+};
+
+// Importing parameters
+options.parameters = walkSync(parametersDir).map((f) => {
+  var filepath = path.join(parametersDir, f);
+  try{
+    logger.log(`Importing parameter file '${filepath}'`);
+    return require(path.resolve(filepath));
+  }catch(e){
+    logger.log(`Could not import parameter file '${filepath}'`);
+  }
+});
+
+var kaukau = new Kaukau(options);
+
+var errors = [];
+
+/**
+* Execute Kaukau instance and listen to events
+*
+* Mocha events:
+* - test
+* - test end
+* - pass
+* - fail
+* - end
+*
+* Kaukau events:
+* - done
+*
+*/
+kaukau.run()
+.on('done', function(){
+  var status = "success";
+  if(errors.length)
+      status = "warn";
+  logger[status]("ALL DONE,", errors.length, "errors");
+})
+.on('fail', function(test){
+  errors.push(test);
+});
