@@ -38,19 +38,27 @@ program
 
 
 program
-  .version(pckg.version)
   .command('init <path>')
+  .option('--directory <name>', 'the folder containing the test files', function(value){
+    return path.join( "" , value)
+  })
+  .option('--parameters <name>', 'the folder containing the parameters files', function(value){
+    return path.join( "" , value) || parametersDir
+  })
   .description('create the files and directories')
   .action(function (value) {
     var mkdir = require('mkdirp');
 
+    value = value || "."
+
     var dirs = {
-      test: path.join(value, program.directory || "test"),
-      parameters: path.join(value, program.parameters || parametersDir)
+      "test": path.join(value, program.directory || "test"),
+      "parameters": path.join(value, parametersDir)
     }
 
     Object.keys(dirs).forEach(
       (d) => {
+          logger.info(`${d}: ${dirs[d]}`)
           mkdir.sync(dirs[d]);
       }
     )
@@ -63,6 +71,10 @@ program.on('option:require', function (value) {
 
 program.on('option:directory', function (value) {
   options['directory'] = value
+});
+
+program.on('option:parameters', function (value) {
+  parametersDir = value
 });
 
 program.on('option:logs', function () {
@@ -107,6 +119,7 @@ var walkSync = function(dir, filelist, subdir) {
 // Importing parameters
 
 if (fs.existsSync(parametersDir)){
+  console.log(parametersDir);
   if(fs.statSync(parametersDir).isDirectory()){
     options.parameters = walkSync(parametersDir).map((f) => {
       var filepath = path.join(parametersDir, f);
