@@ -2,12 +2,11 @@ var kaukau = require('../../../lib/kaukau');
 var request = require('request');
 
 var expect = require('chai').expect;
-//var parameters = kaukau.Configurator.parameters;
 var Parameters = kaukau.Parameters;
 var Tester = kaukau.Tester;
 var Debug = kaukau.Logger.info;
 
-describe('Route 1', function() {
+describe('Route 1 sub2', function() {
 
   //considered slow when ...
   /*this.slow(290);
@@ -32,6 +31,6 @@ describe('Route 1', function() {
   it('status should be 200', function(){
     expect(this.err).to.equal(null);
     expect(this.res.statusCode).to.equal(200);
-    Debug("sub2", Parameters('credentials.email'),this.res.statusCode);
+    Debug(Parameters('credentials.email'),this.res.statusCode);
   });
 });

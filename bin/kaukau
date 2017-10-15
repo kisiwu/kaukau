@@ -1,112 +1,138 @@
 #! /usr/bin/env node
 
-var fs = require('fs');
-var path = require('path');
-var Kaukau = require('..');
-var logger = require('../lib/logger');
-var options = {};
+const pckg = require('../package'),
+      fs = require('fs'),
+      path = require('path'),
+      program = require('commander'),
+      Kaukau = require('..'),
+      logger = require('../lib/logger');
 
 logger.warn("'kaukau' command line is still in development !")
 
-var directory = ""
-var enableLogs, exitOnFail, silent;
-var requiredModules = "";
+//var directory = ""
+//var enableLogs = false, exitOnFail = false, silent = false;
 
-/**
-* --require module1,module2,...
-*/
-requiredModules = process.argv.indexOf('--require') === -1
-    ? requiredModules
-    : process.argv[process.argv.indexOf('--require') + 1] || ""
-requiredModules = requiredModules.split(",")
+var requiredModules = [];
+var parametersDir = 'config/kaukau';
+var options = {
+  enableLogs: false,
+  exitOnFail: false,
+  directory: ""
+};
 
-/**
-* -d test
-*/
-directory = process.argv.indexOf('-d') === -1
-    ? directory
-    : path.join( directory , (process.argv[process.argv.indexOf('-d') + 1] || ""))
-
-/**
-* --logs
-*/
-enableLogs = process.argv.indexOf('--logs') === -1
-    ? false
-    : true
-/**
-* -exit-on-fail
-*/
-exitOnFail = process.argv.indexOf('-exit-on-fail') === -1
-    ? false
-    : true
-
-/**
-* --logs
-*/
-silent = process.argv.indexOf('--silent') === -1
-    ? false
-    : true
-
-options['directory'] = directory
-options['enableLogs'] = enableLogs
-options['exitOnFail'] = exitOnFail
+program
+  .version(pckg.version)
+  .usage('[options]')
+  .option('-r, --require <names>', 'require the given modules', function(value){
+    return value.split(",")
+  })
+  .option('--directory <name>', 'the folder containing the test files', function(value){
+    return path.join( "" , value)
+  })
+  .option('--parameters <name>', 'the folder containing the parameters files', function(value){
+    return path.join( "" , value) || parametersDir
+  })
+  .option('--logs', 'enable logs')
+  .option('--exit-on-fail', 'exit after the first set of tests if a test failed')
+  .option('--silent', 'silence all console print');
 
 
-/**
-* handle cmd options values
-*/
+program
+  .version(pckg.version)
+  .command('init <path>')
+  .description('create the files and directories')
+  .action(function (value) {
+    var mkdir = require('mkdirp');
 
-if(silent)
-    logger.off();
+    var dirs = {
+      test: path.join(value, program.directory || "test"),
+      parameters: path.join(value, program.parameters || parametersDir)
+    }
 
-//logger.info("-d", directory)
+    Object.keys(dirs).forEach(
+      (d) => {
+          mkdir.sync(dirs[d]);
+      }
+    )
+    process.exit(0)
+  });
+
+program.on('option:require', function (value) {
+  requiredModules = program.require
+});
+
+program.on('option:directory', function (value) {
+  options['directory'] = value
+});
+
+program.on('option:logs', function () {
+  options['enableLogs'] = true
+});
+
+program.on('option:exit-on-fail', function () {
+  options['exitOnFail'] = true
+});
+
+program.on('option:silent', function () {
+  logger.off()
+});
+
+program.parse(process.argv)
 
 requiredModules.forEach(
-function(mod){
-logger.info("--require", mod)
-require(mod)
-}
+  function(mod){
+    logger.info("--require", mod)
+    require(mod)
+  }
 );
-
-
-var parametersDir = 'parameters/kaukau';
-
-// if flag 'project', concat it's value to paramaters dirname to get the parameters sets to import
-parametersDir = process.argv.indexOf('--parameters') === -1
-    ? parametersDir
-    : process.argv[process.argv.indexOf('--parameters') + 1] || parametersDir;
-
-//logger.info("--parameters", parametersDir)
 
 var walkSync = function(dir, filelist, subdir) {
   subdir = subdir || "";
-  var files = fs.readdirSync(dir);
   filelist = filelist || [];
-  files.forEach(function(file) {
-    if (fs.statSync(path.join(dir, file)).isDirectory()) {
-      filelist = walkSync(path.join(dir, file), filelist, path.join(subdir, file));
-    }
-    else {
-      filelist.push(path.join(subdir, file));
-    }
-  });
+  if(fs.existsSync(dir)){
+    var files = fs.readdirSync(dir);
+    files.forEach(function(file) {
+      if (fs.statSync(path.join(dir, file)).isDirectory()) {
+        filelist = walkSync(path.join(dir, file), filelist, path.join(subdir, file));
+      }
+      else {
+        filelist.push(path.join(subdir, file));
+      }
+    });
+  }
   return filelist;
 };
 
-// Importing parameters
-options.parameters = walkSync(parametersDir).map((f) => {
-  var filepath = path.join(parametersDir, f);
-  try{
-    logger.log(`Importing parameter file '${filepath}'`);
-    return require(path.resolve(filepath));
-  }catch(e){
-    logger.log(`Could not import parameter file '${filepath}'`);
-  }
-});
 
-var kaukau = new Kaukau(options);
+// Importing parameters
+
+if (fs.existsSync(parametersDir)){
+  if(fs.statSync(parametersDir).isDirectory()){
+    options.parameters = walkSync(parametersDir).map((f) => {
+      var filepath = path.join(parametersDir, f);
+      try{
+        //logger.log(`Importing parameter file '${filepath}'`);
+        return require(path.resolve(filepath));
+      }catch(e){
+        logger.error(`Could not import parameter file '${filepath}'`, e);
+      }
+    });
+  }
+  else{
+    options.parameters = [parametersDir].map((f) => {
+      var filepath = path.join("", f);
+      try{
+        //logger.log(`Importing parameter file '${filepath}'`);
+        return require(path.resolve(filepath));
+      }catch(e){
+        logger.error(`Could not import parameter file '${filepath}'`, e);
+      }
+    });
+  }
+}
 
 var errors = [];
+var kaukau = new Kaukau(options);
 
 /**
 * Execute Kaukau instance and listen to events

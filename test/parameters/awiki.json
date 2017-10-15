@@ -1,0 +1,19 @@
+{
+  "host": "https://en.wikipedia.org/",
+  "credentials": {
+    "email": "anotherexample@sample.com",
+    "password": "anotherexample123"
+  },
+  "mochaOptions":{
+    "reporterOptions": {
+      "reportDir": "logs/reports",
+      "reportFilename": "wikipedia",
+      "enableCharts": false
+    }
+  },
+  "kaukauOptions": {
+    "files": [
+      "sub"
+    ]
+  }
+}

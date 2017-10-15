@@ -1,0 +1,14 @@
+{
+  "host": "https://www.google.be/",
+  "credentials": {
+    "email": "example@sample.com",
+    "password": "example123"
+  },
+  "mochaOptions":{
+    "reporterOptions": {
+      "reportDir": "logs/reports",
+      "reportFilename": "google",
+      "enableCharts": false
+    }
+  }
+}
