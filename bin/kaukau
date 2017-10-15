@@ -119,29 +119,23 @@ var walkSync = function(dir, filelist, subdir) {
 // Importing parameters
 
 if (fs.existsSync(parametersDir)){
-  console.log(parametersDir);
+  var param1Join = ""
+  var paramsSets = [parametersDir]
+
   if(fs.statSync(parametersDir).isDirectory()){
-    options.parameters = walkSync(parametersDir).map((f) => {
-      var filepath = path.join(parametersDir, f);
-      try{
-        //logger.log(`Importing parameter file '${filepath}'`);
-        return require(path.resolve(filepath));
-      }catch(e){
-        logger.error(`Could not import parameter file '${filepath}'`, e);
-      }
-    });
+    param1Join = parametersDir
+    paramsSets = walkSync(parametersDir)
   }
-  else{
-    options.parameters = [parametersDir].map((f) => {
-      var filepath = path.join("", f);
-      try{
-        //logger.log(`Importing parameter file '${filepath}'`);
-        return require(path.resolve(filepath));
-      }catch(e){
-        logger.error(`Could not import parameter file '${filepath}'`, e);
-      }
-    });
-  }
+
+  options.parameters = paramsSets.map((f) => {
+    var filepath = path.join(param1Join, f);
+    try{
+      //logger.log(`Importing parameter file '${filepath}'`);
+      return require(path.resolve(filepath));
+    }catch(e){
+      logger.error(`Could not import parameter file '${filepath}'`, e);
+    }
+  });
 }
 
 var errors = [];
