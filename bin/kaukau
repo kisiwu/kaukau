@@ -12,13 +12,22 @@ logger.warn("'kaukau' command line is still in development !")
 //var directory = ""
 //var enableLogs = false, exitOnFail = false, silent = false;
 
-var requiredModules = [];
-var parametersDir = 'config/kaukau';
+const DEFAULTS = {
+  parametersDir: 'config/kaukau'
+}
+
+var raw = {
+
+}
+
+var requiredModules = []
+var configFile = ""
+var parametersDir = ''
 var options = {
-  enableLogs: false,
+  /*enableLogs: false,
   exitOnFail: false,
-  directory: ""
-};
+  directory: ""*/
+}
 
 program
   .version(pckg.version)
@@ -29,7 +38,10 @@ program
   .option('--directory <name>', 'the folder containing the test files', function(value){
     return path.join( "" , value)
   })
-  .option('--parameters <name>', 'the folder containing the parameters files', function(value){
+  .option('--config <name>', 'the file containing the main configuration', function(value){
+    return path.join( "" , value) || configFile
+  })
+  .option('--parameters <name>', 'the folder/file containing the parameters', function(value){
     return path.join( "" , value) || parametersDir
   })
   .option('--logs', 'enable logs')
@@ -40,9 +52,15 @@ program
 program
   .command('init <path>')
   .option('--directory <name>', 'the folder containing the test files', function(value){
+    raw.directory = value
     return path.join( "" , value)
   })
+  .option('--config <name>', 'the file containing the main configuration', function(value){
+    raw.config = value
+    return path.join( "" , value) || configFile
+  })
   .option('--parameters <name>', 'the folder containing the parameters files', function(value){
+    raw.parameters = value
     return path.join( "" , value) || parametersDir
   })
   .description('create the files and directories')
@@ -53,7 +71,48 @@ program
 
     var dirs = {
       "test": path.join(value, program.directory || "test"),
-      "parameters": path.join(value, parametersDir)
+      "parameters": parametersDir ? path.join(value, parametersDir) : path.join(value, DEFAULTS.parametersDir)
+    }
+
+    var files = {
+      "config": configFile ? path.join(value, configFile) : configFile
+    }
+
+    var filesWrite = {
+      "config": function(filepath){
+        // Change the content of the file as you want
+        // or either set fileContent to null to create an empty file
+        const contentJSON = '{\n'
+        +'\t"enableLogs": false,\n'
+        +'\t"exitOnFail": false,\n'
+        +'\t"directory": "'+(raw.directory ? raw.directory.replace(/\\/g,'/') : "test")+'",\n'
+        +'\t"options": {\n'
+        +'\t\t"bail": false,\n'
+        +'\t\t"fullTrace": true,\n'
+        +'\t\t"grep": "",\n'
+        +'\t\t"ignoreLeaks": true,\n'
+        +'\t\t"reporter": "spec",\n'
+        +'\t\t"retries": 0,\n'
+        +'\t\t"slow": 150,\n'
+        +'\t\t"timeout": 10000,\n'
+        +'\t\t"ui": "bdd",\n'
+        +'\t\t"useColors": true\n'
+        +'\t}\n'
+        +'}'
+
+        const fileContentJS = 'module.exports = '+contentJSON
+
+        try{
+          if(filepath && filepath.length > 2 && !fs.existsSync(filepath)){
+            var fileContent = fileContentJS
+            if(filepath.length >= 5 && filepath.substr(-5) === '.json')
+              fileContent = contentJSON
+            fs.writeFileSync(filepath, fileContent);
+          }
+        }catch (e){
+            logger.error("Cannot write file ", e);
+        }
+      }
     }
 
     Object.keys(dirs).forEach(
@@ -62,6 +121,18 @@ program
           mkdir.sync(dirs[d]);
       }
     )
+
+    Object.keys(files).forEach(
+      (f) => {
+          if(!files[f]) return;
+          mkdir.sync(path.dirname(files[f]))
+          if(filesWrite[f]){
+            filesWrite[f](files[f])
+            logger.info(`${f}: ${files[f]}`)
+          }
+      }
+    )
+
     process.exit(0)
   });
 
@@ -71,6 +142,10 @@ program.on('option:require', function (value) {
 
 program.on('option:directory', function (value) {
   options['directory'] = value
+});
+
+program.on('option:config', function (value) {
+  configFile = value
 });
 
 program.on('option:parameters', function (value) {
@@ -115,10 +190,23 @@ var walkSync = function(dir, filelist, subdir) {
   return filelist;
 };
 
+// Importing config file
+
+if(configFile){
+  try{
+    var config = require(path.resolve(configFile));
+    Object.keys(config).forEach( p => {
+      if(typeof options[p] === 'undefined')
+        options[p] = config[p]
+    } )
+  }catch(e){
+    logger.error(`Could not import configuration file '${configFile}'`, e);
+  }
+}
 
 // Importing parameters
 
-if (fs.existsSync(parametersDir)){
+if (parametersDir && fs.existsSync(parametersDir)){
   var param1Join = ""
   var paramsSets = [parametersDir]
 
@@ -139,6 +227,9 @@ if (fs.existsSync(parametersDir)){
 }
 
 var errors = [];
+
+//logger.log(options)
+//process.exit(0)
 var kaukau = new Kaukau(options);
 
 /**

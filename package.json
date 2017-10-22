@@ -9,8 +9,8 @@
     "url": "https://github.com/kisiwu/kaukau.git"
   },
   "scripts": {
-    "cmd": "node ./bin/kaukau --directory test/tests --parameters test/parameters",
-    "init": "node ./bin/kaukau init . --directory test/tests --parameters test/parameters",
+    "cmd": "node ./bin/kaukau --directory test/tests --parameters test/config/parameters --config test/config/main.json",
+    "init": "node ./bin/kaukau init . --directory test/tests --parameters test/config/parameters --config test/config/main.json",
     "test": "node ./test/test.js"
   },
   "bin": {

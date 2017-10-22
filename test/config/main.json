@@ -1,0 +1,31 @@
+{
+	"enableLogs": false,
+	"exitOnFail": false,
+	"directory": "test/tests",
+	"options": {
+		"bail": false,
+		"fullTrace": true,
+		"grep": "",
+		"ignoreLeaks": false,
+		"reporter": "spec",
+		"retries": 0,
+		"slow": 150,
+		"timeout": 10000,
+		"ui": "bdd",
+		"useColors": true
+	},
+	"parameters": {
+	  "host": "https://www.google.be/",
+	  "credentials": {
+	    "email": "example@sample.com",
+	    "password": "example123"
+	  },
+	  "mochaOptions":{
+	    "reporterOptions": {
+	      "reportDir": "logs/reports",
+	      "reportFilename": "google",
+	      "enableCharts": false
+	    }
+	  }
+	}
+}
