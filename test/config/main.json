@@ -12,7 +12,7 @@
 		"slow": 150,
 		"timeout": 10000,
 		"ui": "bdd",
-		"useColors": true
+		"color": true
 	},
 	"parameters": {
 	  "host": "https://www.google.be/",

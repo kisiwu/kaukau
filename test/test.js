@@ -13,7 +13,7 @@ var kaukau = new Kaukau(
     "enableLogs": true,
     "exitOnFail": false,
     "options": {
-      "useColors": true,
+      "color": true,
       "timeout": 10000,
       //"reporter": "mochawesome"
     },
@@ -25,7 +25,7 @@ var kaukau = new Kaukau(
           "password": "anotherexample123"
         },
         "mochaOptions":{
-          "useColors": false,
+          "color": false,
           "reporterOptions": {
             "reportDir": "logs/reports",
             "reportFilename": "wikipedia",
