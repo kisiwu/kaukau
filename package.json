@@ -1,7 +1,7 @@
 {
   "name": "kaukau",
   "private": false,
-  "version": "0.0.65",
+  "version": "0.0.70",
   "description": "JS test tools, Mocha wrapper",
   "main": "index.js",
   "repository": {
@@ -25,11 +25,11 @@
   "license": "MIT",
   "dependencies": {
     "async-waterfall": "^0.1.5",
-    "chai": "^4.1.0",
+    "chai": "^4.2.0",
     "commander": "^2.11.0",
-    "deep-property-access": "^1.0.0",
-    "mkdirp": "^0.5.1",
-    "mocha": "^6.2.2",
+    "deep-property-access": "^1.0.1",
+    "mkdirp": "^1.0.3",
+    "mocha": "^7.1.1",
     "request": "^2.88.0",
     "request-mocha": "^0.2.0"
   },
