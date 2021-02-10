@@ -8,7 +8,7 @@ const pckg = require('../package'),
       logger = require('../lib/logger'),
       _actions = require('./_actions');
 
-logger.warn("'kaukau' command line is still in development !")
+// logger.warn("'kaukau' command line is still in development !")
 
 //var directory = ""
 //var enableLogs = false, exitOnFail = false, silent = false;
