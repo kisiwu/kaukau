@@ -40,7 +40,7 @@ kaukau.run()
 ## Configuration
 
 Example:
-```json
+```js
 {
   /* kaukau options */
   "enableLogs": true,
