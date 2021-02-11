@@ -8,6 +8,11 @@ Logger.indent(5);
 var kaukau = new Kaukau(
   {
     "directory": "test/tests",
+    /*
+    "files": [
+      "test/tests/sub2"
+    ],
+    */
     "first": "login.js",
     "last": "logout.js",
     "enableLogs": true,
@@ -34,7 +39,7 @@ var kaukau = new Kaukau(
         },
         "kaukauOptions": {
           "files": [
-            "sub"
+            "test/tests/sub"
           ]
         }
       },

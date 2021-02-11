@@ -1,0 +1,18 @@
+
+- documentation:
+  - Helpers > Tester
+
+- command line:
+  - add option --ignore-files to ignore "files" options from config file (that way "directory" completely  overwrites path to test files) 
+
+- code:
+  - logger: 
+    - replace current local logger with @novice1/logger   
+  - clean up
+
+Archive:
+- configuration: @done
+  - directory @done
+    - should not be used at all to look for files in "files" @done
+  - files @done
+    - should overwrite "directory" if not empty @done
