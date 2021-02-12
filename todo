@@ -1,7 +1,3 @@
-
-- documentation:
-  - Helpers > Tester
-
 - command line:
   - add option --ignore-files to ignore "files" options from config file (that way "directory" completely  overwrites path to test files) 
 
@@ -11,6 +7,8 @@
   - clean up
 
 Archive:
+- documentation: @done
+  - Helpers > Tester @done
 - configuration: @done
   - directory @done
     - should not be used at all to look for files in "files" @done

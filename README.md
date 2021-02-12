@@ -21,10 +21,10 @@ $ kaukau --help
 
 Programmatically:
 ```js
-var Kaukau = require('kaukau');
-var config = require('./config');
+const Kaukau = require('kaukau');
+const config = require('./config');
 
-var kaukau = new Kaukau(config);
+const kaukau = new Kaukau(config);
 
 kaukau.run()
   // kaukau events
@@ -67,7 +67,7 @@ Example:
 }
 ```
 
-Learn more about `parameters` option [here](###parameters).
+Learn more about `parameters` option [here](#parameters).
 
 See `mocha` options [here](https://mochajs.org/api/mocha).
 
@@ -79,11 +79,10 @@ The following helpers are the reason why `kaukau` exists.
 
 Usefull if you need to run the same tests with different parameters and options.
 
-If you define sets of `parameters` in your [configuration](##configuration), the test scripts will be executed for each set.
+If you define sets of `parameters` in your [configuration](#configuration), the test scripts will be executed for each set.
 You can access parameters for the current set running as:
 ```js
-var kaukau = require('kaukau');
-var Parameters = kaukau.Parameters;
+const { Parameters } = require('kaukau');
 
 describe('test 01', function() {
   /**
@@ -97,12 +96,51 @@ describe('test 01', function() {
    *  }
    * ]
    */
-  var host = Parameters('host'); // "test.com"
-  var email = Parameters('credentials.email'); // "test@test.com"
+  let host = Parameters('host'); // "test.com"
+  let email = Parameters('credentials.email'); // "test@test.com"
 });
 ```
 
 ### Tester
+
+Example:
+```js
+const kaukau = require('kaukau');
+const { Parameters, Tester } = require('kaukau');
+
+// set default options (request.defaults)
+Tester.setRequestDefaults({});
+
+// overwrite default options
+Tester.updateRequestDefaults({});
+
+/* request */
+
+it('should be ok', (done) => {
+  Tester.request({
+    method: 'GET',
+    url: Parameters('host')
+  }, (err, res, body) => {
+    expect(err).to.equal(null);
+    expect(res.statusCode).to.equal(200);
+    done();
+  });
+});
+
+// or
+
+Tester.save({
+  method: 'GET',
+  url: Parameters('host')
+});
+
+it('should be ok', function(){
+  expect(this.err).to.equal(null);
+  expect(this.res.statusCode).to.equal(200);
+});
+```
+
+Learn more about the options [here](https://www.npmjs.com/package/request).
 
 ## Reference
 
