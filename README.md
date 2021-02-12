@@ -69,7 +69,7 @@ Example:
 
 Learn more about `parameters` option [here](#parameters).
 
-See `mocha` options [here](https://mochajs.org/api/mocha).
+See `mocha` options [there](https://mochajs.org/api/mocha).
 
 ## Helpers
 
@@ -140,7 +140,7 @@ it('should be ok', function(){
 });
 ```
 
-Learn more about the options [here](https://www.npmjs.com/package/request).
+Learn more about the options [there](https://www.npmjs.com/package/request).
 
 ## Reference
 
