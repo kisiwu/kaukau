@@ -1,9 +1,4 @@
 var Kaukau = require('../index');
-var Logger = Kaukau.Logger;
-
-Logger.indent(5);
-
-//Logger.off();
 
 var kaukau = new Kaukau(
   {
@@ -22,7 +17,7 @@ var kaukau = new Kaukau(
       "timeout": 10000,
       //"reporter": "mochawesome"
     },
-    "parameters": [
+    "parameters": [/*
       {
         "host": "https://en.wikipedia.org/",
         "credentials": {
@@ -42,7 +37,7 @@ var kaukau = new Kaukau(
             "test/tests/sub"
           ]
         }
-      },
+      },*/
       {
         "host": "https://www.google.be/",
         "credentials": {
@@ -50,11 +45,14 @@ var kaukau = new Kaukau(
           "password": "example123"
         },
         "mochaOptions":{
+          // reporter: require('path').resolve('test/reporter')
+          /*
           "reporterOptions": {
             "reportDir": "logs/reports",
             "reportFilename": "google",
             "enableCharts": false
           }
+          */
         }
       }
     ]
@@ -63,13 +61,10 @@ var kaukau = new Kaukau(
 
 kaukau.run()
 .on('done', function(){
-  //Logger.on();
-  Logger.tab(3).info("ALL DONE");
+  // done
 })
 .on('fail', function(test){
-  //Logger.on();
-  Logger.error(test.title);
-  Logger.error(test.err.message);
-  Logger.error(test.file);
-  //Logger.off();
+  console.error(test.title);
+  console.error(test.err.message);
+  console.error(test.file);
 });

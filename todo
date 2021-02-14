@@ -1,10 +1,11 @@
+- code:
+  - logger: @done
+    - replace current local logger with @novice1/logger (https://mochajs.org/api/tutorial-custom-reporter.html) @done
+  - set parameters and logger in suites (ctx.kaukau) @done
+  - clean up
+
 - command line:
   - add option --ignore-files to ignore "files" options from config file (that way "directory" completely  overwrites path to test files) 
-
-- code:
-  - logger: 
-    - replace current local logger with @novice1/logger   
-  - clean up
 
 Archive:
 - documentation: @done

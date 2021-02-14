@@ -1,6 +1,6 @@
 const fs = require('fs'),
       path = require('path'),
-      logger = require('../lib/logger');
+      logger = require('@novice1/logger');
 
 module.exports = {
   init: function init(dirs, files, fileWriters){

@@ -1,146 +1,176 @@
 #! /usr/bin/env node
 
 const pckg = require('../package'),
-      fs = require('fs'),
-      path = require('path'),
-      program = require('commander'),
-      Kaukau = require('..'),
-      logger = require('../lib/logger'),
-      _actions = require('./_actions');
-
-// logger.warn("'kaukau' command line is still in development !")
+  fs = require('fs'),
+  path = require('path'),
+  program = require('commander'),
+  logger = require('@novice1/logger'),
+  debug = logger.debugger('kaukau:cmd'),
+  Kaukau = require('..'),
+  _actions = require('./_actions');
 
 //var directory = ""
 //var enableLogs = false, exitOnFail = false, silent = false;
 
 const DEFAULTS = {
-  parametersDir: 'config/kaukau'
-}
+  parametersDir: 'config/kaukau',
+};
 
-var raw = {
+var raw = {};
 
-}
-
-var requiredModules = []
-var configFile = ""
-var parametersDir = ''
+var requiredModules = [];
+var configFile = '';
+var parametersDir = '';
 var options = {
   /*enableLogs: false,
   exitOnFail: false,
   directory: ""*/
-}
+};
 
 program
   .version(pckg.version)
   .usage('[options]')
-  .option('-r, --require <names>', 'require the given modules', function(value){
-    return value.split(",")
-  })
-  .option('--directory <name>', 'the folder containing the test files', function(value){
-    raw.directory = value
-    return path.join( "" , value)
-  })
-  .option('--config <name>', 'the file containing the main configuration', function(value){
-    raw.config = value
-    return path.join( "" , value) || configFile
-  })
-  .option('--parameters <name>', 'the folder/file containing the parameters', function(value){
-    raw.parameters = value
-    return path.join( "" , value) || parametersDir
-  })
+  .option(
+    '-r, --require <names>',
+    'require the given modules',
+    function (value) {
+      return value.split(',');
+    }
+  )
+  .option(
+    '--directory <name>',
+    'the folder containing the test files',
+    function (value) {
+      raw.directory = value;
+      return path.join('', value);
+    }
+  )
+  .option(
+    '--config <name>',
+    'the file containing the main configuration',
+    function (value) {
+      raw.config = value;
+      return path.join('', value) || configFile;
+    }
+  )
+  .option(
+    '--parameters <name>',
+    'the folder/file containing the parameters',
+    function (value) {
+      raw.parameters = value;
+      return path.join('', value) || parametersDir;
+    }
+  )
   .option('--logs', 'enable logs')
-  .option('--exit-on-fail', 'exit after the first set of tests if a test failed')
+  .option(
+    '--exit-on-fail',
+    'exit after the first set of tests if a test failed'
+  )
   .option('--silent', 'silence all console print');
-
 
 program
   .command('init <path>')
-  .option('--directory <name>', 'the folder containing the test files', function(value){
-    raw.directory = value
-    return path.join( "" , value)
-  })
-  .option('--config <name>', 'the file containing the main configuration', function(value){
-    raw.config = value
-    return path.join( "" , value) || configFile
-  })
-  .option('--parameters <name>', 'the folder containing the parameters files', function(value){
-    raw.parameters = value
-    return path.join( "" , value) || parametersDir
-  })
+  .option(
+    '--directory <name>',
+    'the folder containing the test files',
+    function (value) {
+      raw.directory = value;
+      return path.join('', value);
+    }
+  )
+  .option(
+    '--config <name>',
+    'the file containing the main configuration',
+    function (value) {
+      raw.config = value;
+      return path.join('', value) || configFile;
+    }
+  )
+  .option(
+    '--parameters <name>',
+    'the folder containing the parameters files',
+    function (value) {
+      raw.parameters = value;
+      return path.join('', value) || parametersDir;
+    }
+  )
   .description('create the files and directories')
   .action(function (value) {
     var mkdir = require('mkdirp');
 
-    value = value || "."
+    value = value || '.';
 
     var dirs = {
-      "test": path.join(value, program.directory || "test"),
-      "parameters": parametersDir ? path.join(value, parametersDir) : path.join(value, DEFAULTS.parametersDir)
-    }
+      test: path.join(value, program.directory || 'test'),
+      parameters: parametersDir
+        ? path.join(value, parametersDir)
+        : path.join(value, DEFAULTS.parametersDir),
+    };
 
     var files = {
-      "config": configFile ? path.join(value, configFile) : configFile
-    }
+      config: configFile ? path.join(value, configFile) : configFile,
+    };
 
     var filesWrite = {
-      "config": function(filepath){
-        const contentJSON = _actions.getConfigContent(raw.directory || "test")
-        _actions.writeJSON(filepath, contentJSON)
-      }
-    }
+      config: function (filepath) {
+        const contentJSON = _actions.getConfigContent(raw.directory || 'test');
+        _actions.writeJSON(filepath, contentJSON);
+      },
+    };
 
-    _actions.init(dirs, files, filesWrite)
+    _actions.init(dirs, files, filesWrite);
 
-    process.exit(0)
+    process.exit(0);
   });
 
 program.on('option:require', function (value) {
-  requiredModules = program.require
+  requiredModules = program.require;
 });
 
 program.on('option:directory', function (value) {
-  options['directory'] = value
+  options['directory'] = value;
 });
 
 program.on('option:config', function (value) {
-  configFile = value
+  configFile = value;
 });
 
 program.on('option:parameters', function (value) {
-  parametersDir = value
+  parametersDir = value;
 });
 
 program.on('option:logs', function () {
-  options['enableLogs'] = true
+  options['enableLogs'] = true;
 });
 
 program.on('option:exit-on-fail', function () {
-  options['exitOnFail'] = true
+  options['exitOnFail'] = true;
 });
 
 program.on('option:silent', function () {
-  logger.off()
+  // custom silent reporter ?
 });
 
-program.parse(process.argv)
+program.parse(process.argv);
 
-requiredModules.forEach(
-  function(mod){
-    logger.info("--require", mod)
-    require(mod)
-  }
-);
+requiredModules.forEach(function (mod) {
+  debug.silly('--require', mod);
+  require(mod);
+});
 
-var walkSync = function(dir, filelist, subdir) {
-  subdir = subdir || "";
+var walkSync = function (dir, filelist, subdir) {
+  subdir = subdir || '';
   filelist = filelist || [];
-  if(fs.existsSync(dir)){
+  if (fs.existsSync(dir)) {
     var files = fs.readdirSync(dir);
-    files.forEach(function(file) {
+    files.forEach(function (file) {
       if (fs.statSync(path.join(dir, file)).isDirectory()) {
-        filelist = walkSync(path.join(dir, file), filelist, path.join(subdir, file));
-      }
-      else {
+        filelist = walkSync(
+          path.join(dir, file),
+          filelist,
+          path.join(subdir, file)
+        );
+      } else {
         filelist.push(path.join(subdir, file));
       }
     });
@@ -150,67 +180,52 @@ var walkSync = function(dir, filelist, subdir) {
 
 // Importing config file
 
-if(configFile){
-  try{
+if (configFile) {
+  try {
     var config = require(path.resolve(configFile));
-    Object.keys(config).forEach( p => {
-      if(typeof options[p] === 'undefined')
-        options[p] = config[p]
-    } )
-  }catch(e){
+    Object.keys(config).forEach((p) => {
+      if (typeof options[p] === 'undefined') options[p] = config[p];
+    });
+  } catch (e) {
     logger.error(`Could not import configuration file '${configFile}'`, e);
   }
 }
 
 // Importing parameters
 
-if (parametersDir && fs.existsSync(parametersDir)){
-  var param1Join = ""
-  var paramsSets = [parametersDir]
+if (parametersDir && fs.existsSync(parametersDir)) {
+  var param1Join = '';
+  var paramsSets = [parametersDir];
 
-  if(fs.statSync(parametersDir).isDirectory()){
-    param1Join = parametersDir
-    paramsSets = walkSync(parametersDir)
+  if (fs.statSync(parametersDir).isDirectory()) {
+    param1Join = parametersDir;
+    paramsSets = walkSync(parametersDir);
   }
 
   options.parameters = paramsSets.map((f) => {
     var filepath = path.join(param1Join, f);
-    try{
-      //logger.log(`Importing parameter file '${filepath}'`);
+    try {
+      debug.silly(`Importing parameter file '${filepath}'`);
       return require(path.resolve(filepath));
-    }catch(e){
+    } catch (e) {
       logger.error(`Could not import parameter file '${filepath}'`, e);
     }
   });
 }
 
-var errors = [];
-
-//logger.log(options)
+debug.debug('options:', options)
 //process.exit(0)
 var kaukau = new Kaukau(options);
 
 /**
-* Execute Kaukau instance and listen to events
-*
-* Mocha events:
-* - test
-* - test end
-* - pass
-* - fail
-* - end
-*
-* Kaukau events:
-* - done
-*
-*/
-kaukau.run()
-.on('done', function(){
-  var status = "success";
-  if(errors.length)
-      status = "warn";
-  logger[status]("ALL DONE,", errors.length, "errors");
-})
-.on('fail', function(test){
-  errors.push(test);
-});
+ * Execute Kaukau instance and listen to events
+ *
+ * Mocha.Runner events:
+ * - https://mochajs.org/api/runner
+ *
+ * Kaukau events:
+ * - 'done'
+ *
+ */
+kaukau
+  .run();

@@ -28,8 +28,8 @@ const kaukau = new Kaukau(config);
 
 kaukau.run()
   // kaukau events
-  .on('done', function(){ /* succeeds */ })
-  // mocha events
+  .on('done', function(){ /* done testing */ })
+  // mocha events (https://mochajs.org/api/runner)
   .on('test', function(test) {})
   .on('test end', function(test) {})
   .on('pass', function(test) {})
@@ -82,9 +82,10 @@ Usefull if you need to run the same tests with different parameters and options.
 If you define sets of `parameters` in your [configuration](#configuration), the test scripts will be executed for each set.
 You can access parameters for the current set running as:
 ```js
-const { Parameters } = require('kaukau');
-
 describe('test 01', function() {
+
+  const { Parameters } = this.ctx.kaukau;
+
   /**
    * In configuration:
    * parameters: [
@@ -105,38 +106,42 @@ describe('test 01', function() {
 
 Example:
 ```js
-const kaukau = require('kaukau');
-const { Parameters, Tester } = require('kaukau');
+const { Tester } = require('kaukau');
 
-// set default options (request.defaults)
-Tester.setRequestDefaults({});
+describe('test 02', function() {
 
-// overwrite default options
-Tester.updateRequestDefaults({});
+  const { Parameters } = this.ctx.kaukau;
 
-/* request */
-
-it('should be ok', (done) => {
-  Tester.request({
+  // set default options (request.defaults)
+  Tester.setRequestDefaults({});
+  
+  // overwrite default options
+  Tester.updateRequestDefaults({});
+  
+  /* request */
+  
+  it('should be ok', (done) => {
+    Tester.request({
+      method: 'GET',
+      url: Parameters('host')
+    }, (err, res, body) => {
+      expect(err).to.equal(null);
+      expect(res.statusCode).to.equal(200);
+      done();
+    });
+  });
+  
+  // or
+  
+  Tester.save({
     method: 'GET',
     url: Parameters('host')
-  }, (err, res, body) => {
-    expect(err).to.equal(null);
-    expect(res.statusCode).to.equal(200);
-    done();
   });
-});
-
-// or
-
-Tester.save({
-  method: 'GET',
-  url: Parameters('host')
-});
-
-it('should be ok', function(){
-  expect(this.err).to.equal(null);
-  expect(this.res.statusCode).to.equal(200);
+  
+  it('should be ok', function(){
+    expect(this.err).to.equal(null);
+    expect(this.res.statusCode).to.equal(200);
+  });
 });
 ```
 
@@ -146,3 +151,4 @@ Learn more about the options [there](https://www.npmjs.com/package/request).
 
 - [mocha](https://mochajs.org/)
 - [chai](https://www.chaijs.com/api/)
+- [request](https://www.npmjs.com/package/request)

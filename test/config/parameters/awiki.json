@@ -13,7 +13,7 @@
   },
   "kaukauOptions": {
     "files": [
-      "sub"
+      "test/tests/sub"
     ]
   }
 }

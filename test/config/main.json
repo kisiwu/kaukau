@@ -1,5 +1,5 @@
 {
-	"enableLogs": false,
+	"enableLogs": true,
 	"exitOnFail": false,
 	"directory": "test/tests",
 	"options": {
