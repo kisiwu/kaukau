@@ -4,7 +4,8 @@
   - set parameters and logger in suites (ctx.kaukau) @done
   - should Tester be in ctx.kaukau too ? @done
   - replace steps (loading files, ...) by events instead of just logs
-  - clean up
+  - clean up bin/
+  - clean up lib/
 
 - use 'glob' to be able to use patterns in 'files' (as mocha cli does)
 
