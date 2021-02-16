@@ -9,19 +9,16 @@ const pckg = require('../package'),
   Kaukau = require('..'),
   _actions = require('./_actions');
 
-//var directory = ""
-//var enableLogs = false, exitOnFail = false, silent = false;
-
 const DEFAULTS = {
   parametersDir: 'config/kaukau',
 };
 
-var raw = {};
+let raw = {};
 
-var requiredModules = [];
-var configFile = '';
-var parametersDir = '';
-var options = {
+let requiredModules = [];
+let configFile = '';
+let parametersDir = '';
+let options = {
   /*enableLogs: false,
   exitOnFail: false,
   directory: ""*/
@@ -96,24 +93,22 @@ program
   )
   .description('create the files and directories')
   .action(function (value) {
-    var mkdir = require('mkdirp');
-
     value = value || '.';
 
-    var dirs = {
-      test: path.join(value, program.directory || 'test'),
+    let dirs = {
+      test: path.join(value, program.directory || 'tests'),
       parameters: parametersDir
         ? path.join(value, parametersDir)
         : path.join(value, DEFAULTS.parametersDir),
     };
 
-    var files = {
+    let files = {
       config: configFile ? path.join(value, configFile) : configFile,
     };
 
-    var filesWrite = {
+    let filesWrite = {
       config: function (filepath) {
-        const contentJSON = _actions.getConfigContent(raw.directory || 'test');
+        const contentJSON = _actions.getConfigContent(raw.directory || 'tests');
         _actions.writeJSON(filepath, contentJSON);
       },
     };
@@ -158,11 +153,11 @@ requiredModules.forEach(function (mod) {
   require(mod);
 });
 
-var walkSync = function (dir, filelist, subdir) {
+let walkSync = function (dir, filelist, subdir) {
   subdir = subdir || '';
   filelist = filelist || [];
   if (fs.existsSync(dir)) {
-    var files = fs.readdirSync(dir);
+    let files = fs.readdirSync(dir);
     files.forEach(function (file) {
       if (fs.statSync(path.join(dir, file)).isDirectory()) {
         filelist = walkSync(
@@ -182,7 +177,7 @@ var walkSync = function (dir, filelist, subdir) {
 
 if (configFile) {
   try {
-    var config = require(path.resolve(configFile));
+    let config = require(path.resolve(configFile));
     Object.keys(config).forEach((p) => {
       if (typeof options[p] === 'undefined') options[p] = config[p];
     });
@@ -194,8 +189,8 @@ if (configFile) {
 // Importing parameters
 
 if (parametersDir && fs.existsSync(parametersDir)) {
-  var param1Join = '';
-  var paramsSets = [parametersDir];
+  let param1Join = '';
+  let paramsSets = [parametersDir];
 
   if (fs.statSync(parametersDir).isDirectory()) {
     param1Join = parametersDir;
@@ -203,7 +198,7 @@ if (parametersDir && fs.existsSync(parametersDir)) {
   }
 
   options.parameters = paramsSets.map((f) => {
-    var filepath = path.join(param1Join, f);
+    let filepath = path.join(param1Join, f);
     try {
       debug.silly(`Importing parameter file '${filepath}'`);
       return require(path.resolve(filepath));
@@ -215,7 +210,7 @@ if (parametersDir && fs.existsSync(parametersDir)) {
 
 debug.debug('options:', options)
 //process.exit(0)
-var kaukau = new Kaukau(options);
+let kaukau = new Kaukau(options);
 
 /**
  * Execute Kaukau instance and listen to events

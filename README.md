@@ -143,7 +143,7 @@ describe('test 02', function() {
 });
 ```
 
-Learn more about the options [there](https://www.npmjs.com/package/request).
+Learn more about the options for `tester.request` and `tester.save` [there](https://www.npmjs.com/package/request).
 
 ## Reference
 
