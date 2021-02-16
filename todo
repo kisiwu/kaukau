@@ -3,8 +3,8 @@
     - replace current local logger with @novice1/logger (https://mochajs.org/api/tutorial-custom-reporter.html) @done
   - set parameters and logger in suites (ctx.kaukau) @done
   - should Tester be in ctx.kaukau too ? @done
-  - clean up
   - replace steps (loading files, ...) by events instead of just logs
+  - clean up
 
 - use 'glob' to be able to use patterns in 'files' (as mocha cli does)
 
