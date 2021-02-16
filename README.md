@@ -73,7 +73,7 @@ See `mocha` options [there](https://mochajs.org/api/mocha).
 
 ## Helpers
 
-The following helpers are the reason why `kaukau` exists.
+The following helpers come with `kaukau`.
 
 ### Parameters
 
@@ -84,7 +84,7 @@ You can access parameters for the current set running as:
 ```js
 describe('test 01', function() {
 
-  const { Parameters } = this.ctx.kaukau;
+  const { params } = this.ctx.kaukau;
 
   /**
    * In configuration:
@@ -97,8 +97,8 @@ describe('test 01', function() {
    *  }
    * ]
    */
-  let host = Parameters('host'); // "test.com"
-  let email = Parameters('credentials.email'); // "test@test.com"
+  let host = params('host'); // "test.com"
+  let email = params('credentials.email'); // "test@test.com"
 });
 ```
 
@@ -106,24 +106,22 @@ describe('test 01', function() {
 
 Example:
 ```js
-const { Tester } = require('kaukau');
-
 describe('test 02', function() {
 
-  const { Parameters } = this.ctx.kaukau;
+  const { params, tester } = this.ctx.kaukau;
 
   // set default options (request.defaults)
-  Tester.setRequestDefaults({});
+  tester.setRequestDefaults({});
   
   // overwrite default options
-  Tester.updateRequestDefaults({});
+  tester.updateRequestDefaults({});
   
   /* request */
   
   it('should be ok', (done) => {
-    Tester.request({
+    tester.request({
       method: 'GET',
-      url: Parameters('host')
+      url: params('host')
     }, (err, res, body) => {
       expect(err).to.equal(null);
       expect(res.statusCode).to.equal(200);
@@ -133,9 +131,9 @@ describe('test 02', function() {
   
   // or
   
-  Tester.save({
+  tester.save({
     method: 'GET',
-    url: Parameters('host')
+    url: params('host')
   });
   
   it('should be ok', function(){

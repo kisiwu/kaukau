@@ -2,7 +2,10 @@
   - logger: @done
     - replace current local logger with @novice1/logger (https://mochajs.org/api/tutorial-custom-reporter.html) @done
   - set parameters and logger in suites (ctx.kaukau) @done
+  - should Tester be in ctx.kaukau too ? @done
   - clean up
+
+- use 'glob' to be able to use patterns in 'files' (as mocha cli does)
 
 - command line:
   - add option --ignore-files to ignore "files" options from config file (that way "directory" completely  overwrites path to test files) 
