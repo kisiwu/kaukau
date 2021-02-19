@@ -3,14 +3,12 @@ var Kaukau = require('../index');
 var kaukau = new Kaukau(
   {
     "directory": "test/tests",
-    /*
-    "files": [
-      "test/tests/sub2"
-    ],
-    */
+    //"files": [
+    //  "test/tests/sub2"
+    //],
     "first": "login.js",
     "last": "logout.js",
-    "enableLogs": true,
+    "enableLogs": false,
     "exitOnFail": false,
     "options": {
       "color": true,
@@ -43,6 +41,11 @@ var kaukau = new Kaukau(
         "credentials": {
           "email": "example@sample.com",
           "password": "example123"
+        },
+        "kaukauOptions": {
+          "exitOnFail": true,
+          "file": "test/tests/",
+          "files": "test/tests/sub2"
         },
         "mochaOptions":{
           // reporter: require('path').resolve('test/reporter')

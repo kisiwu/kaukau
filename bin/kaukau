@@ -29,22 +29,30 @@ program
   .usage('[options]')
   .option(
     '-r, --require <names>',
-    'require the given modules',
+    'require modules',
     function (value) {
       return value.split(',');
     }
   )
   .option(
     '--directory <name>',
-    'the folder containing the test files',
+    'the folder containing the test files (DEPRECATED)',
     function (value) {
       raw.directory = value;
       return path.join('', value);
     }
   )
   .option(
-    '--config <name>',
-    'the file containing the main configuration',
+    '-f, --file <name>',
+    'file or directory of tests',
+    function (value) {
+      raw.directory = value;
+      return path.join('', value);
+    }
+  )
+  .option(
+    '-c, --config <name>',
+    'file containing the main configuration',
     function (value) {
       raw.config = value;
       return path.join('', value) || configFile;
@@ -63,7 +71,8 @@ program
     '--exit-on-fail',
     'exit after the first set of tests if a test failed'
   )
-  .option('--silent', 'silence all console print');
+  .option('--silent', 'silence all console print')
+  .option('--debug', 'debugger');
 
 program
   .command('init <path>')
@@ -123,7 +132,12 @@ program.on('option:require', function (value) {
 });
 
 program.on('option:directory', function (value) {
+  logger.warn('"--directory" is deprecated. Use "--file" instead.')
   options['directory'] = value;
+});
+
+program.on('option:file', function (value) {
+  options['file'] = value;
 });
 
 program.on('option:config', function (value) {
@@ -144,6 +158,11 @@ program.on('option:exit-on-fail', function () {
 
 program.on('option:silent', function () {
   // custom silent reporter ?
+  options['silent'] = true;
+});
+
+program.on('option:debug', function () {
+  require('debug').enable('kaukau:*')
 });
 
 program.parse(process.argv);
@@ -208,8 +227,8 @@ if (parametersDir && fs.existsSync(parametersDir)) {
   });
 }
 
-debug.debug('options:', options)
-//process.exit(0)
+// debug.debug('options:', options)
+
 let kaukau = new Kaukau(options);
 
 /**
