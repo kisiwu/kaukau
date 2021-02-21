@@ -1,5 +1,5 @@
 # kaukau
-JS test tools, [Mocha](https://mochajs.org/) wrapper.
+NodeJS test tools, [Mocha](https://mochajs.org/) wrapper.
 
 ## Install
 
@@ -9,20 +9,41 @@ $ npm install kaukau --save-dev
 
 ## Usage
 
-Run `tests/`:
-```bash
-$ kaukau
-```
+### CLI
 
-Display help:
+Set up [config](#configuration) file:
+```bash
+$ kaukau setup
+```
+```bash
+$ kaukau setup --config kaukau-config.js
+```
+```bash
+$ kaukau setup --config kaukau-config.js --file tests/
+```
+Run with custom [config](#configuration):
+```bash
+$ kaukau --config kaukau-config.js
+```
+Run `tests/` with default config:
+```bash
+$ kaukau --file tests/
+```
+Run `tests/` with custom [config](#configuration):
+```bash
+$ kaukau start --config kaukau-config.js --file tests/
+```
+Other options are available. Display help:
 ```bash
 $ kaukau --help
 ```
 
-Programmatically:
+### Programmatically
+
+Run:
 ```js
 const Kaukau = require('kaukau');
-const config = require('./config');
+const config = require('./kaukau-config');
 
 const kaukau = new Kaukau(config);
 
@@ -39,14 +60,27 @@ kaukau.run()
 
 ## Configuration
 
+A JSON object with the following properties:
+
+- `enableLogs`: (boolean) Enable/disable kaukau logs. Default: `true`.
+
+- `exitOnFail`: (boolean) Exit after a test fails. If `true`, it won't execute tests for the next sets of parameters if there are some. Default: `false`.
+
+- `files`: (string|string[]) Files and/or directories to be loaded for execution. Default: `[]`.
+
+- `ext`: (string) File extensions to be loaded if `files` contains path to directories. Default: `'.js'`.
+
+- `options`: See `mocha` options [there](https://mochajs.org/api/mocha).
+
+- `parameters`: (object|object[]) Learn more about `parameters` option [here](#parameters).
+
 Example:
 ```js
 {
   /* kaukau options */
   "enableLogs": true,
   "exitOnFail": false,
-  "directory": "tests", // path/to/test/scripts
-  "files": [], // Overwrites "directory". Used to limit/order files to be loaded for execution. (e.g.: [ "tests/test01.js" ])
+  "files": [], // Test files/directories to execute. (e.g.: [ "tests/test01.js" ])
   "options": {
     /* mocha options */
   },
@@ -66,10 +100,6 @@ Example:
   ]  
 }
 ```
-
-Learn more about `parameters` option [here](#parameters).
-
-See `mocha` options [there](https://mochajs.org/api/mocha).
 
 ## Helpers
 

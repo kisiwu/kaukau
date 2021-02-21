@@ -28,7 +28,7 @@ describe('Route 1 sub', function() {
   });
 
   it('status should be 200', function(){
-    log.info(params('credentials.email'),this.res.statusCode);
+    log.info(params('credentials.email'));
     expect(this.err).to.equal(null);
     expect(this.res.statusCode).to.equal(200);
   });

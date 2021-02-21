@@ -3,14 +3,12 @@
     - replace current local logger with @novice1/logger (https://mochajs.org/api/tutorial-custom-reporter.html) @done
   - set parameters and logger in suites (ctx.kaukau) @done
   - should Tester be in ctx.kaukau too ? @done
-  - replace steps (loading files, ...) by events instead of just logs
-  - clean up bin/
+  - replace steps (loading files, ...) by events instead of just logs @done
+  - update commander@2.20.3 to commander@7.1.0 @done
+  - clean up bin/ @done
   - clean up lib/
 
-- use 'glob' to be able to use patterns in 'files' (as mocha cli does)
-
-- command line:
-  - add option --ignore-files to ignore "files" options from config file (that way "directory" completely  overwrites path to test files) 
+- use 'glob' to be able to use patterns in 'files' (as mocha cli does) 
 
 Archive:
 - documentation: @done

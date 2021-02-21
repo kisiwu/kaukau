@@ -3,7 +3,7 @@ var request = require('request');
 
 var expect = require('chai').expect;
 
-describe('Route 1 sub2', function() {
+describe('Route 1 sub2 spec', function() {
 
   let {params, log, tester} = this.ctx.kaukau;
 

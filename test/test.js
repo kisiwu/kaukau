@@ -8,8 +8,9 @@ var kaukau = new Kaukau(
     //],
     "first": "login.js",
     "last": "logout.js",
-    "enableLogs": false,
+    "enableLogs": true,
     "exitOnFail": false,
+    "ext": ".spec.js",
     "options": {
       "color": true,
       "timeout": 10000,
@@ -49,13 +50,12 @@ var kaukau = new Kaukau(
         },
         "mochaOptions":{
           // reporter: require('path').resolve('test/reporter')
-          /*
-          "reporterOptions": {
-            "reportDir": "logs/reports",
-            "reportFilename": "google",
-            "enableCharts": false
-          }
-          */
+          
+          //"reporterOptions": {
+          //  "reportDir": "logs/reports",
+          //  "reportFilename": "google",
+          //  "enableCharts": false
+          //}
         }
       }
     ]
