@@ -21,19 +21,21 @@ $ kaukau setup --config kaukau-config.js
 ```bash
 $ kaukau setup --config kaukau-config.js --file tests/
 ```
-Run with custom [config](#configuration):
-```bash
-$ kaukau --config kaukau-config.js
-```
-Run `tests/` with default config:
+Run `tests/`:
 ```bash
 $ kaukau --file tests/
+```
+Run custom [config](#configuration):
+```bash
+$ kaukau --config kaukau-config.js
 ```
 Run `tests/` with custom [config](#configuration):
 ```bash
 $ kaukau start --config kaukau-config.js --file tests/
 ```
-Other options are available. Display help:
+Other options are available. 
+
+Display help:
 ```bash
 $ kaukau --help
 ```
@@ -64,7 +66,7 @@ A JSON object with the following properties:
 
 - `enableLogs`: (boolean) Enable/disable kaukau logs. Default: `true`.
 
-- `exitOnFail`: (boolean) Exit after a test fails. If `true`, it won't execute tests for the next sets of parameters if there are some. Default: `false`.
+- `exitOnFail`: (boolean) Exit after a set of tests fails so it won't execute tests for the next sets of parameters if there are some. Default: `false`.
 
 - `files`: (string|string[]) Files and/or directories to be loaded for execution. Default: `[]`.
 
