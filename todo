@@ -8,14 +8,14 @@
   - clean up bin/ @done
   - clean up lib/
 
-- doc
-  - explain more about parameters:
-    - kaukauOptions and mochaOptions
-  - explain logs (@novice1/logger)
 
 - use 'glob' to be able to use patterns in 'files' (as mocha cli does) 
 
 Archive:
+- doc @done
+  - explain more about parameters: @done
+    - kaukauOptions and mochaOptions @done
+  - explain logs (@novice1/logger) @done
 - documentation: @done
   - Helpers > Tester @done
 - configuration: @done

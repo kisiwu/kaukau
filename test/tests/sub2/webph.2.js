@@ -5,7 +5,7 @@ var expect = require('chai').expect;
 
 describe('Route 1 sub2', function() {
 
-  let {params, log, tester} = this.ctx.kaukau;
+  let {params, logger, tester} = this.ctx.kaukau;
 
   //console.log(this.ctx.kaukau);
   //console.log(this.ctx.kaukau.log);
@@ -32,7 +32,7 @@ describe('Route 1 sub2', function() {
   });
 
   it('status should be 200', function(){
-    log.info(params('credentials.email'));
+    logger.info(params('credentials.email'));
     expect(this.err).to.equal(null);
     expect(this.res.statusCode).to.equal(200);
   });

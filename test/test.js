@@ -9,6 +9,7 @@ var kaukau = new Kaukau(
     "first": "login.js",
     "last": "logout.js",
     "enableLogs": true,
+    "logLevel": "debug",
     "exitOnFail": false,
     "ext": ".spec.js",
     "options": {

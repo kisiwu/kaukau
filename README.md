@@ -66,6 +66,8 @@ A JSON object with the following properties:
 
 - `enableLogs`: (boolean) Enable/disable kaukau logs. Default: `true`.
 
+- `logLevel`: (string) `error`, `warn`, `info`, `verbose`, `debug`, `silly`. Default: `silly`. Learn usage [here](#logger).
+
 - `exitOnFail`: (boolean) Exit after a set of tests fails so it won't execute tests for the next sets of parameters if there are some. Default: `false`.
 
 - `files`: (string|string[]) Files and/or directories to be loaded for execution. Default: `[]`.
@@ -134,11 +136,36 @@ describe('test 01', function() {
 });
 ```
 
+Parameters can overwrite the main configuration by using the properties `kaukauOptions` and `mochaOptions`.
+
+`kaukauOptions` can overwrite `files` and `ext`.
+
+`mochaOptions` can overwrite all [mocha](https://mochajs.org/api/mocha) options.
+
+### Logger
+
+Logging utility.
+
+```js
+describe('test 02', function() {
+
+  const { logger } = this.ctx.kaukau;
+
+  logger.silly('silly level');
+  logger.debug('debug level');
+  logger.log('verbose level');
+  logger.info('info level');
+  logger.warn('warn level');
+  logger.error('error level');
+});
+```
+
+
 ### Tester
 
 Example:
 ```js
-describe('test 02', function() {
+describe('test 03', function() {
 
   const { params, tester } = this.ctx.kaukau;
 
