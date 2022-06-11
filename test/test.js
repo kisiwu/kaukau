@@ -66,6 +66,7 @@ var kaukau = new Kaukau(
 kaukau.run()
 .on('done', function(){
   // done
+  console.log('done')
 })
 .on('fail', function(test){
   console.error(test.title);
