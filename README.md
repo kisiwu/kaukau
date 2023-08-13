@@ -169,7 +169,7 @@ describe('test 03', function() {
 
   const { params, tester } = this.ctx.kaukau;
 
-  // set default options (request.defaults)
+  // set default options (axios.defaults)
   tester.setRequestDefaults({});
   
   // overwrite default options
@@ -183,7 +183,7 @@ describe('test 03', function() {
       url: params('host')
     }, (err, res, body) => {
       expect(err).to.equal(null);
-      expect(res.statusCode).to.equal(200);
+      expect(res.status).to.equal(200);
       done();
     });
   });
@@ -197,7 +197,7 @@ describe('test 03', function() {
   
   it('should be ok', function(){
     expect(this.err).to.equal(null);
-    expect(this.res.statusCode).to.equal(200);
+    expect(this.res.status).to.equal(200);
   });
 });
 ```
@@ -208,4 +208,4 @@ Learn more about the options for `tester.request` and `tester.save` [there](http
 
 - [mocha](https://mochajs.org/)
 - [chai](https://www.chaijs.com/api/)
-- [request](https://www.npmjs.com/package/request)
+- [axios](https://www.npmjs.com/package/axios)

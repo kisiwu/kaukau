@@ -14,11 +14,11 @@ describe('Route 1 sub2', function() {
   it('status should be 200', (done) => {
     tester.request({
       method: 'GET',
-      url: parameters.host+'/webhp'
+      url: params('host')+'/webhp'
     }, (err, res, body) => {
       expect(err).to.equal(null);
-      expect(res.statusCode).to.equal(200);
-      log(res.statusCode);
+      expect(res.status).to.equal(200);
+      log(res.status);
       done();
     });
   });*/
@@ -31,6 +31,6 @@ describe('Route 1 sub2', function() {
   it('status should be 200', function(){
     logger.info(params('credentials.email'));
     expect(this.err).to.equal(null);
-    expect(this.res.statusCode).to.equal(200);
+    expect(this.res.status).to.equal(200);
   });
 });
