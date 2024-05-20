@@ -50,13 +50,16 @@ var kaukau = new Kaukau(
           "files": "test/tests/sub2"
         },
         "mochaOptions":{
-          // reporter: require('path').resolve('test/reporter')
+          //reporter: require('path').resolve('test/reporter')
           
-          //"reporterOptions": {
-          //  "reportDir": "logs/reports",
-          //  "reportFilename": "google",
-          //  "enableCharts": false
-          //}
+          /*
+          "reporter": "mochawesome",
+          "reporterOptions": {
+            "reportDir": "logs/reports",
+            "reportFilename": "google",
+            "enableCharts": false
+          }
+          */
         }
       }
     ]
