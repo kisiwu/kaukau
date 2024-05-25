@@ -7,6 +7,7 @@
   - update commander@2.20.3 to commander@7.1.0 @done
   - clean up bin/ @done
   - clean up lib/
+  - watch file with chokidar
 
 
 - use 'glob' to be able to use patterns in 'files' (as mocha cli does) 
