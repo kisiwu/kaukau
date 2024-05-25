@@ -4,7 +4,7 @@ NodeJS test tools, [Mocha](https://mochajs.org/) wrapper.
 ## Install
 
 ```bash
-$ npm install kaukau --save-dev
+npm install kaukau --save-dev
 ```
 
 ## Usage
@@ -13,31 +13,31 @@ $ npm install kaukau --save-dev
 
 Set up [config](#configuration) file:
 ```bash
-$ kaukau setup
+kaukau setup
 ```
 ```bash
-$ kaukau setup --config kaukau-config.js
+kaukau setup --config kaukau-config.js
 ```
 ```bash
-$ kaukau setup --config kaukau-config.js --file tests/
+kaukau setup --config kaukau-config.js --file tests/
 ```
 Run `tests/`:
 ```bash
-$ kaukau --file tests/
+kaukau --file tests/
 ```
 Run custom [config](#configuration):
 ```bash
-$ kaukau --config kaukau-config.js
+kaukau --config kaukau-config.js
 ```
 Run `tests/` with custom [config](#configuration):
 ```bash
-$ kaukau start --config kaukau-config.js --file tests/
+kaukau start --config kaukau-config.js --file tests/
 ```
 Other options are available. 
 
 Display help:
 ```bash
-$ kaukau --help
+kaukau --help
 ```
 
 ### Programmatically
@@ -165,6 +165,9 @@ describe('test 02', function() {
 
 Example:
 ```js
+// chai@4
+const { expect } = require('chai');
+
 describe('test 03', function() {
 
   const { params, tester } = this.ctx.kaukau;
@@ -177,15 +180,13 @@ describe('test 03', function() {
   
   /* request */
   
-  it('should be ok', (done) => {
-    tester.request({
+  it('should be ok', async () => {
+    const res = await tester.request({
       method: 'GET',
       url: params('host')
-    }, (err, res, body) => {
-      expect(err).to.equal(null);
-      expect(res.status).to.equal(200);
-      done();
     });
+
+    expect(res.status).to.equal(200);
   });
   
   // or
@@ -202,7 +203,7 @@ describe('test 03', function() {
 });
 ```
 
-Learn more about the options for `tester.request` and `tester.save` [there](https://www.npmjs.com/package/request).
+Learn more about the options for `tester.request` and `tester.save` at [Axios Request Config](https://axios-http.com/docs/req_config).
 
 ## Reference
 
