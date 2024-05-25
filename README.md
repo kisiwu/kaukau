@@ -185,7 +185,6 @@ describe('test 03', function() {
       method: 'GET',
       url: params('host')
     });
-
     expect(res.status).to.equal(200);
   });
   
