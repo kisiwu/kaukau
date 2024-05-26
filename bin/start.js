@@ -2,7 +2,8 @@ const Kaukau = require('../index'),
   logger = require('@novice1/logger'),
   debug = logger.debugger('kaukau:cmd:start'),
   fs = require('fs'),
-  path = require('path');
+  path = require('path'),
+  watch = require('./watch');
 
 function run(options) {
   let kaukau = new Kaukau(options);
@@ -36,6 +37,39 @@ function listFilesRecSync(dir, filelist, subdir) {
 function startFactory(program) {
   return function startAction() {
     let opts = program.opts();
+
+    if (!opts.ignore && opts.watch && opts.watch.length) {
+      // VERY IMPORTANT to send:
+      // - files to watch
+      // - updated command (--ignore)
+      /**
+       * @type {string[]}
+       */
+      let args = process.argv.map(arg => arg);
+      let cmdIdx = args.findIndex( str => str.endsWith('kaukau') );
+      if (cmdIdx > -1) {
+        // start args from 'kaukau' command
+        args = args.slice(cmdIdx)
+        // extract command
+        const cmd = args.shift();
+        // remove --watch <globs...>
+        let watchStart = args.indexOf('--watch'), watchEnd = -1;
+        if (watchStart > -1) {
+          for(let i = watchStart+1; i < args.length; i++) {
+            if (args[i].startsWith('-')) {
+              break;
+            }
+            watchEnd = i
+          }
+          if (watchEnd > watchStart) {
+            args = args.slice(0, watchStart).concat(args.slice(watchEnd+1))
+          }
+        }
+        // add --ignore (just in case)
+        args.push('--ignore')
+        return watch(opts.watch, cmd, args)
+      }
+    }
 
     let options = {};
 

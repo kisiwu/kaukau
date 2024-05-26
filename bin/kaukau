@@ -51,6 +51,11 @@ program
   .option('--no-logs', 'disable logs')
   .option('--exit-on-fail', 'exit after the first set of tests that has a fail')
   .option('--no-exit-on-fail', "don't exit if tests fail")
+  .option(
+    '--watch <globs...>',
+    'files to watch to run the tests'
+  )
+  .option('--ignore', 'do not watch files (overrides --watch)')
   .action(startFactory(program));
 
 program.parse(process.argv);

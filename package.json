@@ -1,7 +1,7 @@
 {
   "name": "kaukau",
   "private": false,
-  "version": "3.1.2",
+  "version": "4.0.0-alpha.0",
   "description": "JS test tools, Mocha wrapper",
   "main": "index.js",
   "repository": {
@@ -12,7 +12,8 @@
     "testcmd": "node ./bin/kaukau",
     "cmd": "node ./bin/kaukau --file test/tests --parameters test/config/parameters --config test/config/main.json",
     "init": "node ./bin/kaukau init --file test/tests/o2 --config test/config/main.json",
-    "test": "node ./test/test.js"
+    "test": "node ./test/test.js",
+    "watch": "node ./bin/kaukau --file test/tests --parameters test/config/parameters --config test/config/main.json --watch test/**/*.spec.js test/config/**/*.{json,js} --logs"
   },
   "bin": {
     "kaukau": "bin/kaukau"
@@ -29,6 +30,7 @@
     "async-waterfall": "^0.1.5",
     "axios": "^1.7.2",
     "chai": "^4.4.1",
+    "chokidar": "^3.6.0",
     "commander": "^12.1.0",
     "deep-property-access": "^1.0.1",
     "mkdirp": "^3.0.1",
