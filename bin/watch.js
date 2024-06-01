@@ -22,43 +22,13 @@ function fgColorText(txt, color) {
     return `\x1b[38;5;174m\x1b[${color || 0}m${txt}\x1b[0m`
 }
 
-/**
- * 
- * @param {string[]} arr 
- * @returns 
- */
-function formatMessage(arr) {
-    return Array.from(arr)
-        .map(function (x) {
-            if (Array.isArray(x)) {
-                return "[" + formatMessage(x) + "]";
-            } else if (typeof x === "object") {
-                let v = x;
-                try {
-                    v = util.inspect(x, {
-                        depth: 5,
-                        compact: true,
-                        breakLength: Infinity,
-                        colors: false,
-                        getters: true,
-                    });
-                } catch (e) {
-                }
-                return v;
-            } else {
-                return x;
-            }
-        })
-        .join(" ");
-}
-
 const customLogger = Logger.createLogger({
     write({ args }) {
         // Logger.colors.BRIGHT = bold
         process.stdout.write(
             bgColorText(' KAUKAU ', Logger.colors.BRIGHT) +
             ' ' +
-            fgColorText(formatMessage(args), Logger.colors.BRIGHT) +
+            fgColorText(Logger.formatMessage(args, true), Logger.colors.BRIGHT) +
             '\n');
     }
 });
