@@ -10,7 +10,7 @@
   - clean up lib/
   - files: glob
   - ext: array of extensions (e.g: ['.js', '.mjs']) @done
-  - suport esm config file (.mjs)
+  - support esm config file and parmeters file for cli (.mjs)
 
 
 - use 'glob' to be able to use patterns in 'files' (as mocha cli does) 
