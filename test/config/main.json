@@ -2,6 +2,7 @@
 	"enableLogs": true,
 	"exitOnFail": false,
 	"directory": "test/tests",
+	"ext": ".js",
 	"options": {
 		"bail": false,
 		"fullTrace": true,

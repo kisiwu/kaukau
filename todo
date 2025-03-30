@@ -9,7 +9,7 @@
   - watch file with chokidar @done
   - clean up lib/
   - files: glob
-  - ext: array of extensions (e.g: ['.js', '.mjs'])
+  - ext: array of extensions (e.g: ['.js', '.mjs']) @done
   - suport esm config file (.mjs)
 
 

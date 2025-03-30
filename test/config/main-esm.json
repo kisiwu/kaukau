@@ -2,7 +2,7 @@
 	"enableLogs": true,
 	"exitOnFail": false,
 	"files": "test/tests",
-    "ext": ".mjs",
+    "ext": [".mjs"],
 	"options": {
 		"bail": false,
 		"fullTrace": true,

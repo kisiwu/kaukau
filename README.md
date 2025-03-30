@@ -72,7 +72,7 @@ A JSON object with the following properties:
 
 - `files`: (string|string[]) Files and/or directories to be loaded for execution. Default: `[]`.
 
-- `ext`: (string) File extensions to be loaded if `files` contains path to directories. Default: `'.js'`.
+- `ext`: (string|string[]) File extensions to be loaded if `files` contains path to directories. Default: `['.js', '.mjs', '.cjs']`.
 
 - `options`: See `mocha` options [there](https://mochajs.org/api/mocha).
 
