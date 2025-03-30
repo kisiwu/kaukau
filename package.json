@@ -1,7 +1,7 @@
 {
   "name": "kaukau",
   "private": false,
-  "version": "4.0.0",
+  "version": "4.1.0",
   "description": "JS test tools, Mocha wrapper",
   "main": "index.js",
   "repository": {
@@ -11,8 +11,10 @@
   "scripts": {
     "testcmd": "node ./bin/kaukau",
     "cmd": "node ./bin/kaukau --file test/tests --parameters test/config/parameters --config test/config/main.json",
+    "cmd:esm": "node ./bin/kaukau --config test/config/main-esm.json",
     "init": "node ./bin/kaukau init --file test/tests/o2 --config test/config/main.json",
     "test": "node ./test/test.js",
+    "test:esm": "node ./test/test-esm.js",
     "watch": "node ./bin/kaukau --file test/tests --parameters test/config/parameters --config test/config/main.json --watch test/config/main.json --logs"
   },
   "bin": {
@@ -28,16 +30,16 @@
   "dependencies": {
     "@novice1/logger": "^1.5.0",
     "async-waterfall": "^0.1.5",
-    "axios": "^1.7.7",
-    "chai": "^4.4.1",
-    "chokidar": "^4.0.0",
-    "commander": "^12.1.0",
+    "axios": "^1.8.4",
+    "chokidar": "^4.0.3",
+    "commander": "^13.1.0",
     "deep-property-access": "^1.0.1",
     "mkdirp": "^3.0.1",
-    "mocha": "^10.7.3",
+    "mocha": "^11.1.0",
     "request-mocha": "^0.2.0"
   },
   "devDependencies": {
+    "chai": "^4.5.0",
     "mochawesome": "^7.1.3"
   }
 }
