@@ -15,7 +15,7 @@
 		"ui": "bdd",
 		"color": true
 	},
-	"parameters": {
+	"parameters": [{
 	  "id": 33,
 	  "mochaOptions":{
 	    "reporterOptions": {
@@ -24,5 +24,14 @@
 	      "enableCharts": false
 	    }
 	  }
-	}
+	},{
+		"id": 55,
+		"mochaOptions":{
+		  "reporterOptions": {
+			"reportDir": "logs/reports",
+			"reportFilename": "esm",
+			"enableCharts": false
+		  }
+		}
+	  }]
 }
