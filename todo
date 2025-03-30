@@ -9,6 +9,7 @@
   - watch file with chokidar @done
   - clean up lib/
   - files: glob
+  - ext: array of extensions (e.g: ['.js', '.mjs'])
 
 
 - use 'glob' to be able to use patterns in 'files' (as mocha cli does) 
