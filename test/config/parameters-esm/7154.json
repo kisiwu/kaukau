@@ -1,0 +1,10 @@
+{
+    "id": 7154,
+    "mochaOptions": {
+        "reporterOptions": {
+            "reportDir": "logs/reports",
+            "reportFilename": "esm",
+            "enableCharts": false
+        }
+    }
+}

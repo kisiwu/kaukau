@@ -5,12 +5,12 @@
   - should Tester be in ctx.kaukau too ? @done
   - replace steps (loading files, ...) by events instead of just logs @done
   - update commander@2.20.3 to commander@7.1.0 @done
-  - clean up bin/ @done
   - watch file with chokidar @done
+  - ext: array of extensions (e.g: ['.js', '.mjs']) @done
+  - support esm config file and parmeters file for cli (.mjs) @done
+  - clean up bin/
   - clean up lib/
   - files: glob
-  - ext: array of extensions (e.g: ['.js', '.mjs']) @done
-  - support esm config file and parmeters file for cli (.mjs)
 
 
 - use 'glob' to be able to use patterns in 'files' (as mocha cli does) 

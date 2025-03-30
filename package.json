@@ -1,7 +1,7 @@
 {
   "name": "kaukau",
   "private": false,
-  "version": "4.1.2",
+  "version": "4.1.3",
   "description": "JS test tools, Mocha wrapper",
   "main": "index.js",
   "repository": {
@@ -11,7 +11,8 @@
   "scripts": {
     "testcmd": "node ./bin/kaukau",
     "cmd": "node ./bin/kaukau --file test/tests --parameters test/config/parameters --config test/config/main.json",
-    "cmd:esm": "node ./bin/kaukau --config test/config/main-esm.json",
+    "cmd:esm": "node ./bin/kaukau --parameters test/config/parameters-esm --config test/config/main-esm.json",
+    "cmd:esm1": "node ./bin/kaukau --config test/config/main-esm.mjs",
     "init": "node ./bin/kaukau init --file test/tests/o2 --config test/config/main.json",
     "test": "node ./test/test.js",
     "test:esm": "node ./test/test-esm.js",

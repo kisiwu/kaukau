@@ -35,7 +35,7 @@ function listFilesRecSync(dir, filelist, subdir) {
  * @returns {function} action
  */
 function startFactory(program) {
-  return function startAction() {
+  return async function startAction() {
     let opts = program.opts();
 
     if (!opts.ignore && opts.watch && opts.watch.length) {
@@ -91,7 +91,19 @@ function startFactory(program) {
       try {
         let fullPathConfig = path.resolve(opts.config);
         debug.debug(fullPathConfig);
-        let config = require(fullPathConfig);
+        //let config = require(fullPathConfig);
+        let config = fullPathConfig.toLowerCase().endsWith('.json') ?
+        require(fullPathConfig) : 
+        (await import(
+          (process.platform == 'win32' ? 'file://' : '') + 
+          fullPathConfig,
+          /*
+          // Importing JSON modules is an experimental feature and might change at any time
+          fullPathConfig.toLowerCase().endsWith('.json') ? 
+          { assert: { type: "json" } } : 
+          undefined
+          */
+        )).default;
         Object.keys(config).forEach((p) => (options[p] = config[p]));
       } catch (e) {
         logger.error(
@@ -119,6 +131,7 @@ function startFactory(program) {
         );
       }
 
+      /*
       options.parameters = params.map((p) => {
         let fullPathParam = path.resolve(p);
         try {
@@ -129,6 +142,31 @@ function startFactory(program) {
           process.exit(2);
         }
       });
+      */
+      options.parameters = []
+      for (const p of params) {
+        let fullPathParam = path.resolve(p);
+        try {
+          debug.debug(fullPathParam);
+          options.parameters.push(
+            fullPathParam.toLowerCase().endsWith('.json') ?
+              require(fullPathParam) :
+              (await import(
+                (process.platform == 'win32' ? 'file://' : '') +
+                fullPathParam,
+                /*
+                // Importing JSON modules is an experimental feature and might change at any time
+                fullPathParam.toLowerCase().endsWith('.json') ? 
+                { assert: { type: "json" } } : 
+                undefined
+                */
+              )).default
+          )
+        } catch (e) {
+          logger.error(`"--parameters": Could not import '${p}'`, e);
+          process.exit(2);
+        }
+      }
     }
 
     // --logs/--no-logs

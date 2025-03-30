@@ -1,6 +1,8 @@
 # kaukau
 NodeJS test tools, [Mocha](https://mochajs.org/) wrapper.
 
+ESM support (>=4.1.3).
+
 ## Install
 
 ```bash
