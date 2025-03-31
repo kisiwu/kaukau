@@ -16,6 +16,8 @@ declare class Kaukau {
     run(): Runner;
 }
 
+export interface Runner {}
+
 // #region Runner "waiting" event
 interface Runner {
     on(event: "waiting", listener: (rootSuite: Suite) => void): this;
