@@ -1,9 +1,25 @@
 {
   "name": "kaukau",
   "private": false,
-  "version": "4.1.4",
+  "version": "4.1.5",
   "description": "JS test tools, Mocha wrapper",
   "main": "index.js",
+  "types": "./index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "default": "./index.js"
+    },
+    "./kaukau": {
+      "types": "./lib/kaukau.d.ts",
+      "default": "./lib/kaukau.js"
+    },
+    "./config": {
+      "types": "./lib/config.d.ts",
+      "default": "./lib/config.js"
+    },
+    "./package.json": "./package.json"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/kisiwu/kaukau.git"
@@ -41,6 +57,7 @@
     "request-mocha": "^0.2.0"
   },
   "devDependencies": {
+    "@types/mocha": "^10.0.10",
     "chai": "^4.5.0",
     "mochawesome": "^7.1.3"
   }

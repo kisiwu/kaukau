@@ -53,7 +53,7 @@ const kaukau = new Kaukau(config);
 
 kaukau.run()
   // kaukau events
-  .on('done', function(){ /* done testing */ })
+  .on('done', function(totalFailures){ /* done testing */ })
   // mocha events (https://mochajs.org/api/runner)
   .on('test', function(test) {})
   .on('test end', function(test) {})

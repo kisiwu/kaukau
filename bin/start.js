@@ -7,7 +7,11 @@ const Kaukau = require('../index'),
 
 function run(options) {
   let kaukau = new Kaukau(options);
-  kaukau.run();
+  kaukau.run().on('done', (totalFailures) => {
+    process.on('exit', function () {
+      process.exit(totalFailures); // exit with non-zero status if there were failures
+    });
+  });
 }
 
 function listFilesRecSync(dir, filelist, subdir) {
