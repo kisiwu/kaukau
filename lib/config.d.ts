@@ -10,9 +10,5 @@ export interface KaukauConfig extends KaukauOptions {
     parameters: (IParameters | unknown)[];
 }
 
-export function defineConfig(): KaukauConfig;
 export function defineConfig(config?: KaukauOptions): KaukauConfig;
-
-export function defineParameters(): IParameters[];
-export function defineParameters(parameters?: IParameters): IParameters[];
-export function defineParameters(parameters?: IParameters[]): IParameters[];
+export function defineParameters(parameters?: IParameters | IParameters[]): IParameters[];
