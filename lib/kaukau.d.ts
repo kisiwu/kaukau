@@ -50,7 +50,7 @@ export interface Runner extends NodeJS.EventEmitter {
 }
 // #endregion Runner "end" event
 // #region Runner "suite" event
-interface Runner extends NodeJS.EventEmitter {
+export interface Runner extends NodeJS.EventEmitter {
     on(event: "suite", listener: (suite: Suite) => void): this;
     once(event: "suite", listener: (suite: Suite) => void): this;
     addListener(event: "suite", listener: (suite: Suite) => void): this;
