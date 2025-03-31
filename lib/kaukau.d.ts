@@ -17,7 +17,7 @@ declare class Kaukau {
 }
 
 // #region Runner "waiting" event
-interface Runner {
+export interface Runner {
     on(event: "waiting", listener: (rootSuite: Suite) => void): this;
     once(event: "waiting", listener: (rootSuite: Suite) => void): this;
     addListener(event: "waiting", listener: (rootSuite: Suite) => void): this;
@@ -28,7 +28,7 @@ interface Runner {
 }
 // #endregion Runner "waiting" event
 // #region Runner "start" event
-interface Runner extends NodeJS.EventEmitter {
+export interface Runner extends NodeJS.EventEmitter {
     on(event: "start", listener: () => void): this;
     once(event: "start", listener: () => void): this;
     addListener(event: "start", listener: () => void): this;
@@ -39,7 +39,7 @@ interface Runner extends NodeJS.EventEmitter {
 }
 // #endregion Runner "start" event
 // #region Runner "end" event
-interface Runner extends NodeJS.EventEmitter {
+export interface Runner extends NodeJS.EventEmitter {
     on(event: "end", listener: () => void): this;
     once(event: "end", listener: () => void): this;
     addListener(event: "end", listener: () => void): this;
@@ -61,7 +61,7 @@ interface Runner extends NodeJS.EventEmitter {
 }
 // #endregion Runner "suite" event
 // #region Runner "suite end" event
-interface Runner extends NodeJS.EventEmitter {
+export interface Runner extends NodeJS.EventEmitter {
     on(event: "suite end", listener: (suite: Suite) => void): this;
     once(event: "suite end", listener: (suite: Suite) => void): this;
     addListener(event: "suite end", listener: (suite: Suite) => void): this;
@@ -72,7 +72,7 @@ interface Runner extends NodeJS.EventEmitter {
 }
 // #endregion Runner "suite end" event
 // #region Runner "test" event
-interface Runner extends NodeJS.EventEmitter {
+export interface Runner extends NodeJS.EventEmitter {
     on(event: "test", listener: (test: Test) => void): this;
     once(event: "test", listener: (test: Test) => void): this;
     addListener(event: "test", listener: (test: Test) => void): this;
@@ -83,7 +83,7 @@ interface Runner extends NodeJS.EventEmitter {
 }
 // #endregion Runner "test" event
 // #region Runner "test end" event
-interface Runner extends NodeJS.EventEmitter {
+export interface Runner extends NodeJS.EventEmitter {
     on(event: "test end", listener: (test: Test) => void): this;
     once(event: "test end", listener: (test: Test) => void): this;
     addListener(event: "test end", listener: (test: Test) => void): this;
@@ -94,7 +94,7 @@ interface Runner extends NodeJS.EventEmitter {
 }
 // #endregion Runner "test end" event
 // #region Runner "hook" event
-interface Runner extends NodeJS.EventEmitter {
+export interface Runner extends NodeJS.EventEmitter {
     on(event: "hook", listener: (hook: Hook) => void): this;
     once(event: "hook", listener: (hook: Hook) => void): this;
     addListener(event: "hook", listener: (hook: Hook) => void): this;
@@ -105,7 +105,7 @@ interface Runner extends NodeJS.EventEmitter {
 }
 // #endregion Runner "hook" event
 // #region Runner "hook end" event
-interface Runner extends NodeJS.EventEmitter {
+export interface Runner extends NodeJS.EventEmitter {
     on(event: "hook end", listener: (hook: Hook) => void): this;
     once(event: "hook end", listener: (hook: Hook) => void): this;
     addListener(event: "hook end", listener: (hook: Hook) => void): this;
@@ -116,7 +116,7 @@ interface Runner extends NodeJS.EventEmitter {
 }
 // #endregion Runner "hook end" event
 // #region Runner "pass" event
-interface Runner extends NodeJS.EventEmitter {
+export interface Runner extends NodeJS.EventEmitter {
     on(event: "pass", listener: (test: Test) => void): this;
     once(event: "pass", listener: (test: Test) => void): this;
     addListener(event: "pass", listener: (test: Test) => void): this;
@@ -127,7 +127,7 @@ interface Runner extends NodeJS.EventEmitter {
 }
 // #endregion Runner "pass" event
 // #region Runner "fail" event
-interface Runner extends NodeJS.EventEmitter {
+export interface Runner extends NodeJS.EventEmitter {
     on(event: "fail", listener: (test: Test, err: any) => void): this;
     once(event: "fail", listener: (test: Test, err: any) => void): this;
     addListener(event: "fail", listener: (test: Test, err: any) => void): this;
@@ -138,7 +138,7 @@ interface Runner extends NodeJS.EventEmitter {
 }
 // #endregion Runner "fail" event
 // #region Runner "pending" event
-interface Runner extends NodeJS.EventEmitter {
+export interface Runner extends NodeJS.EventEmitter {
     on(event: "pending", listener: (test: Test) => void): this;
     once(event: "pending", listener: (test: Test) => void): this;
     addListener(event: "pending", listener: (test: Test) => void): this;
@@ -149,7 +149,7 @@ interface Runner extends NodeJS.EventEmitter {
 }
 // #endregion Runner "pending" event
 // #region Runner "done" event
-interface Runner extends NodeJS.EventEmitter {
+export interface Runner extends NodeJS.EventEmitter {
     on(event: "done", listener: (totalFailures: number) => void): this;
     once(event: "done", listener: (totalFailures: number) => void): this;
     addListener(event: "done", listener: (totalFailures: number) => void): this;
@@ -169,6 +169,7 @@ export interface Runner extends NodeJS.EventEmitter {
     prependOnceListener(event: string, listener: (...args: any[]) => void): this;
     emit(name: string, ...args: any[]): boolean;
 }
+// #endregion Runner untyped events
 
 export type LogLevel = 'error' | 'warn' | 'info' | 'verbose' | 'debug' | 'silly' | number;
 
