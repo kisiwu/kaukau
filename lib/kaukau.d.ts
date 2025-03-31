@@ -16,8 +16,6 @@ declare class Kaukau {
     run(): Runner;
 }
 
-export interface Runner {}
-
 // #region Runner "waiting" event
 interface Runner {
     on(event: "waiting", listener: (rootSuite: Suite) => void): this;
@@ -162,7 +160,7 @@ interface Runner extends NodeJS.EventEmitter {
 }
 // #endregion Runner "done" event
 // #region Runner untyped events
-interface Runner extends NodeJS.EventEmitter {
+export interface Runner extends NodeJS.EventEmitter {
     on(event: string, listener: (...args: any[]) => void): this;
     once(event: string, listener: (...args: any[]) => void): this;
     addListener(event: string, listener: (...args: any[]) => void): this;
