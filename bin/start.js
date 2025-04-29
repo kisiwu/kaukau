@@ -100,7 +100,7 @@ function startFactory(program) {
         require(fullPathConfig) : 
         (await import(
           (process.platform == 'win32' ? 'file://' : '') + 
-          fullPathConfig,
+          fullPathConfig
           /*
           // Importing JSON modules is an experimental feature and might change at any time
           fullPathConfig.toLowerCase().endsWith('.json') ? 
@@ -157,7 +157,7 @@ function startFactory(program) {
               require(fullPathParam) :
               (await import(
                 (process.platform == 'win32' ? 'file://' : '') +
-                fullPathParam,
+                fullPathParam
                 /*
                 // Importing JSON modules is an experimental feature and might change at any time
                 fullPathParam.toLowerCase().endsWith('.json') ? 
