@@ -204,7 +204,21 @@ describe('test 03', function() {
 });
 ```
 
-Learn more about the options for `tester.request` and `tester.save` at [Axios Request Config](https://axios-http.com/docs/req_config).
+## 📝 Notes
+
+* To run TypeScript test files (e.g. `test/example.test.ts`), make sure to install the required dependencies:
+
+```sh
+npm install --save-dev ts-node @types/mocha
+```
+
+* Then, you can run your test file using:
+
+```sh
+kaukau --require ts-node/register --file test/example.test.ts
+```
+
+> 💡 This enables TypeScript support via `ts-node`, and provides the necessary type definitions for Mocha-style tests.
 
 ## Reference
 
