@@ -1,7 +1,7 @@
 {
   "name": "kaukau",
   "private": false,
-  "version": "4.1.6",
+  "version": "4.1.7",
   "description": "JS test tools, Mocha wrapper",
   "main": "index.js",
   "types": "./index.d.ts",
@@ -36,7 +36,7 @@
     "watch": "node ./bin/kaukau --file test/tests --parameters test/config/parameters --config test/config/main.json --watch test/config/main.json --logs"
   },
   "bin": {
-    "kaukau": "bin/kaukau"
+    "kaukau": "bin/kaukau.js"
   },
   "keywords": [
     "kaukau",
@@ -48,7 +48,7 @@
   "dependencies": {
     "@novice1/logger": "^1.5.0",
     "async-waterfall": "^0.1.5",
-    "axios": "^1.8.4",
+    "axios": "^1.12.2",
     "chokidar": "^4.0.3",
     "commander": "^13.1.0",
     "deep-property-access": "^1.0.1",
