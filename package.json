@@ -1,7 +1,7 @@
 {
   "name": "kaukau",
   "private": false,
-  "version": "4.1.7",
+  "version": "4.2.0",
   "description": "JS test tools, Mocha wrapper",
   "main": "index.js",
   "types": "./index.d.ts",
@@ -46,19 +46,19 @@
   "author": "demingongo (https://github.com/demingongo)",
   "license": "MIT",
   "dependencies": {
-    "@novice1/logger": "^1.5.0",
+    "@novice1/logger": "^1.6.1",
     "async-waterfall": "^0.1.5",
-    "axios": "^1.12.2",
-    "chokidar": "^4.0.3",
-    "commander": "^13.1.0",
+    "axios": "^1.13.3",
+    "chokidar": "^5.0.0",
+    "commander": "^14.0.2",
     "deep-property-access": "^1.0.1",
     "mkdirp": "^3.0.1",
-    "mocha": "^11.1.0",
+    "mocha": "^11.3.0",
     "request-mocha": "^0.2.0"
   },
   "devDependencies": {
     "@types/mocha": "^10.0.10",
     "chai": "^4.5.0",
-    "mochawesome": "^7.1.3"
+    "mochawesome": "^7.1.4"
   }
 }
