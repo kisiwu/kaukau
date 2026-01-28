@@ -1,7 +1,7 @@
 {
   "name": "kaukau",
   "private": false,
-  "version": "4.2.0",
+  "version": "4.2.1",
   "description": "JS test tools, Mocha wrapper",
   "main": "index.js",
   "types": "./index.d.ts",
@@ -49,7 +49,7 @@
     "@novice1/logger": "^1.6.1",
     "async-waterfall": "^0.1.5",
     "axios": "^1.13.3",
-    "chokidar": "^5.0.0",
+    "chokidar": "^4.0.1",
     "commander": "^14.0.2",
     "deep-property-access": "^1.0.1",
     "mkdirp": "^3.0.1",
