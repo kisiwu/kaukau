@@ -2,7 +2,7 @@ var expect = require('chai').expect;
 
 describe('Route 1 sub2 spec', function() {
 
-  let {params, log, tester} = this.ctx.kaukau;
+  let {params, logger, tester} = this.ctx.kaukau;
 
   //console.log(this.ctx.kaukau);
   //console.log(this.ctx.kaukau.log);
@@ -23,14 +23,11 @@ describe('Route 1 sub2 spec', function() {
     });
   });*/
 
-  tester.save({
-    method: 'GET',
-    url: params('host')+'/webhp'
-  });
+  tester.setRequestDefaults({ method: 'GET' });
 
-  it('status should be 200', function(){
-    log.info(params('credentials.email'));
-    expect(this.err).to.equal(null);
-    expect(this.res.status).to.equal(200);
+  it('status should be 200', async function () {
+    const res = await tester.request(params('host') + '/webhp')
+    logger.info(params('credentials.email'));
+    expect(res.status).to.equal(200);
   });
 });

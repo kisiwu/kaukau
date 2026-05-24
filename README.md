@@ -174,7 +174,7 @@ describe('test 03', function() {
 
   const { params, tester } = this.ctx.kaukau;
 
-  // set default options (axios.defaults)
+  // set default options (RequestInit)
   tester.setRequestDefaults({});
   
   // overwrite default options
@@ -183,23 +183,13 @@ describe('test 03', function() {
   /* request */
   
   it('should be ok', async () => {
-    const res = await tester.request({
-      method: 'GET',
-      url: params('host')
+    /**
+     * @type {Response}
+     */
+    const res = await tester.request(params('host'), {
+      method: 'GET'
     });
     expect(res.status).to.equal(200);
-  });
-  
-  // or
-  
-  tester.save({
-    method: 'GET',
-    url: params('host')
-  });
-  
-  it('should be ok', function(){
-    expect(this.err).to.equal(null);
-    expect(this.res.status).to.equal(200);
   });
 });
 ```

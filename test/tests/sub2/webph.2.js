@@ -23,14 +23,14 @@ describe('Route 1 sub2', function() {
     });
   });*/
 
-  tester.save({
-    method: 'GET',
-    url: params('host')+'/webhp'
-  });
+  tester.setRequestDefaults({ method: 'GET' });
 
-  it('status should be 200', function(){
+  it('status should be 200', async function () {
+    /**
+     * @type {Response}
+     */
+    const res = await tester.request(params('host') + '/webhp')
     logger.info(params('credentials.email'));
-    expect(this.err).to.equal(null);
-    expect(this.res.status).to.equal(200);
+    expect(res.status).to.equal(200);
   });
 });
