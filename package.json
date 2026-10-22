@@ -1,7 +1,7 @@
 {
   "name": "kaukau",
   "private": false,
-  "version": "5.0.0",
+  "version": "5.0.1",
   "description": "JS test tools, Mocha wrapper",
   "main": "index.js",
   "types": "./index.d.ts",
@@ -48,11 +48,11 @@
   "dependencies": {
     "@novice1/logger": "^1.6.1",
     "async-waterfall": "^0.1.5",
-    "chokidar": "^5.0.0",
-    "commander": "^14.0.2",
+    "chokidar": "^6.0.0",
+    "commander": "^15.0.0",
     "deep-property-access": "^1.0.1",
     "mkdirp": "^3.0.1",
-    "mocha": "^11.3.0"
+    "mocha": "^11"
   },
   "devDependencies": {
     "@types/mocha": "^10.0.10",

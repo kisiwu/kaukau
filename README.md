@@ -1,7 +1,7 @@
 # kaukau
 NodeJS test tools, [Mocha](https://mochajs.org/) wrapper.
 
-ESM support (>=4.1.4).
+ESM support.
 
 ## Install
 
