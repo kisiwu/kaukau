@@ -1,6 +1,6 @@
 const chokidar = require('chokidar');
 const { fork } = require('child_process');
-const Logger = require('@novice1/logger');
+const { Logger } = require('@novice1/logger');
 
 /**
  * \x1b[48;5;{hardcoded-color}m

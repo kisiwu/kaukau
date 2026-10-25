@@ -68,7 +68,7 @@ A JSON object with the following properties:
 
 - `enableLogs`: (boolean) Enable/disable kaukau logs. Default: `true`.
 
-- `logLevel`: (string) `error`, `warn`, `info`, `verbose`, `debug`, `silly`. Default: `silly`. Learn usage [here](#logger).
+- `logLevel`: (string) `error`, `warn`, `info`, `verbose`, `debug`, `trace`. Default: `verbose`. Learn usage [here](#logger).
 
 - `exitOnFail`: (boolean) Exit after a set of tests fails so it won't execute tests for the next sets of parameters if there are some. Default: `false`.
 
@@ -153,7 +153,7 @@ describe('test 02', function() {
 
   const { logger } = this.ctx.kaukau;
 
-  logger.silly('silly level');
+  logger.trace('trace level');
   logger.debug('debug level');
   logger.log('verbose level');
   logger.info('info level');

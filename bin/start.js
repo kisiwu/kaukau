@@ -1,6 +1,6 @@
 const Kaukau = require('../index'),
-  logger = require('@novice1/logger'),
-  debug = logger.debugger('kaukau:cmd:start'),
+  { Logger } = require('@novice1/logger'),
+  debug = Logger.debugger('kaukau:cmd:start'),
   fs = require('fs'),
   path = require('path'),
   watch = require('./watch');
@@ -85,7 +85,7 @@ function startFactory(program) {
     // --require
     if (opts.require) {
       opts.require.forEach(function (mod) {
-        debug.silly('--require', mod);
+        debug.trace('--require', mod);
         require(mod);
       });
     }
@@ -110,7 +110,7 @@ function startFactory(program) {
         )).default;
         Object.keys(config).forEach((p) => (options[p] = config[p]));
       } catch (e) {
-        logger.error(
+        Logger.error(
           `"--config": Could not import configuration file '${opts.config}'`,
           e
         );
@@ -122,7 +122,7 @@ function startFactory(program) {
     // --parameters
     if (opts.parameters) {
       if (!fs.existsSync(opts.parameters)) {
-        logger.error(`"--parameters": Could not find '${opts.parameters}'`);
+        Logger.error(`"--parameters": Could not find '${opts.parameters}'`);
         process.exitCode = 2;
         return;
       }
@@ -142,7 +142,7 @@ function startFactory(program) {
           debug.debug(fullPathParam);
           return require(fullPathParam);
         } catch (e) {
-          logger.error(`"--parameters": Could not import '${p}'`, e);
+          Logger.error(`"--parameters": Could not import '${p}'`, e);
           process.exit(2);
         }
       });
@@ -167,7 +167,7 @@ function startFactory(program) {
               )).default
           )
         } catch (e) {
-          logger.error(`"--parameters": Could not import '${p}'`, e);
+          Logger.error(`"--parameters": Could not import '${p}'`, e);
           process.exit(2);
         }
       }
@@ -185,7 +185,7 @@ function startFactory(program) {
 
     // --directory (DEPRECATED)
     if (opts.directory) {
-      logger.warn('"--directory" is deprecated. Use "--file" instead.');
+      Logger.warn('"--directory" is deprecated. Use "--file" instead.');
       options.files = [opts.directory];
     }
 

@@ -171,7 +171,7 @@ export interface Runner extends NodeJS.EventEmitter {
 }
 // #endregion Runner untyped events
 
-export type LogLevel = 'error' | 'warn' | 'info' | 'verbose' | 'debug' | 'silly' | number;
+export type LogLevel = 'error' | 'warn' | 'info' | 'verbose' | 'debug' | 'trace' | number;
 
 export interface BaseOptions {
     /**

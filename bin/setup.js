@@ -1,5 +1,5 @@
-const logger = require('@novice1/logger'),
-  debug = logger.debugger('kaukau:cmd:setup'),
+const { Logger } = require('@novice1/logger'),
+  debug = Logger.debugger('kaukau:cmd:setup'),
   fs = require('fs'),
   path = require('path'),
   mkdir = require('mkdirp');
@@ -23,7 +23,7 @@ function setup(configPath, options) {
       fs.writeFileSync(configPath, jsonOptions);
     }
   } catch (e) {
-    logger.error(`Error --config ${configPath}`, e);
+    Logger.error(`Error --config ${configPath}`, e);
     process.exitCode = 1;
   }
 }
@@ -68,7 +68,7 @@ function setupFactory(program) {
 
     // --directory (DEPRECATED)
     if (opts.directory) {
-      logger.warn('"--directory" is deprecated. Use "--file" instead.');
+      Logger.warn('"--directory" is deprecated. Use "--file" instead.');
       options.files = [opts.directory];
     }
 
