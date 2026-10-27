@@ -1,4 +1,4 @@
-var Kaukau = require('../index');
+var {Kaukau} = require('../index');
 
 var kaukau = new Kaukau(
   {

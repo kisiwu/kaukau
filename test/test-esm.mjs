@@ -1,4 +1,4 @@
-import Kaukau from '../index.js';
+import {Kaukau} from '../index.js';
 
 const kaukau = new Kaukau(
   {
