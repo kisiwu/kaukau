@@ -1,9 +1,9 @@
 import type { MochaOptions } from 'mocha';
-import type { LogLevel } from './options';
+import type { IsolateOptions, LogLevel, ResolvedIsolateOptions } from './options';
 
 interface KaukauOptionDefinition {
   readonly name: string;
-  readonly type: 'boolean' | 'number' | 'string' | 'array';
+  readonly type: 'boolean' | 'number' | 'string' | 'array' | 'isolate';
   readonly elemType?: string;
   readonly deprecated?: boolean;
 }
@@ -35,6 +35,10 @@ const KAUKAU_OPTIONS = {
     type: 'array',
     elemType: 'string',
   },
+  ISOLATE: {
+    name: 'isolate',
+    type: 'isolate',
+  },
 
   // DEPRECATED
   _DIRECTORY: {
@@ -58,12 +62,51 @@ export interface ParsedKaukauOptions {
   file?: string;
   files?: string[];
   ext?: string[];
+  isolate?: boolean | IsolateOptions;
 }
 
 type RawOptions = Record<string, unknown>;
 
 function hasLength(value: unknown): boolean {
   return !!value && !!(value as { length?: unknown }).length;
+}
+
+function toStringList(value: unknown, splitString: boolean): string[] {
+  if (Array.isArray(value)) {
+    return value.filter((el): el is string => typeof el === 'string');
+  }
+  if (typeof value === 'string') {
+    return splitString ? value.split(',') : [value];
+  }
+  return [];
+}
+
+function parseIsolate(value: unknown): boolean | IsolateOptions {
+  if (value && typeof value === 'object' && !Array.isArray(value)) {
+    const { require: req, execArgv } = value as RawOptions;
+    return {
+      require: toStringList(req, true),
+      execArgv: toStringList(execArgv, false),
+    };
+  }
+  return !!value;
+}
+
+/**
+ * Normalizes the `isolate` option.
+ * @returns the settings of the child process, or `null` if the isolation is disabled
+ */
+export function resolveIsolate(isolate?: boolean | IsolateOptions | null): ResolvedIsolateOptions | null {
+  if (!isolate) {
+    return null;
+  }
+  if (isolate === true) {
+    return { require: [], execArgv: [] };
+  }
+  return {
+    require: toStringList(isolate.require, true),
+    execArgv: toStringList(isolate.execArgv, false),
+  };
 }
 
 function parseKaukauOption(
@@ -78,6 +121,8 @@ function parseKaukauOption(
     let value: unknown = opts[k];
     if (type === 'boolean') {
       value = !!value;
+    } else if (type === 'isolate') {
+      value = parseIsolate(value);
     } else if (type === 'array') {
       let list: unknown[];
       if (Array.isArray(value)) {

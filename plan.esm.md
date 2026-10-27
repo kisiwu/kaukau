@@ -1,6 +1,6 @@
 # Plan: isolate each set of parameters in a child process (`isolate` option)
 
-Status: **plan only, no code changed yet.**
+Status: **implemented in `src/`** (steps 1 to 9 of section 8). Remaining, outside `src/`: CLI flags in `bin/start.js`, tests under `test/`, release (see "Status" at the end of section 8 and section 10). Sections below were updated to describe what was built; deviations from the first version of this plan are marked **(changed)**.
 
 ## 1. The problem
 
@@ -41,11 +41,12 @@ Worker threads only win on startup time, but they share process-level state and 
 
 ## 4. Public API
 
-- `isolate?: boolean | { require?: string[]; execArgv?: string[] }` in `KaukauOptions` (src/options.ts), and `isolate?: boolean` in `BaseOptions` so a set can override it through `kaukauOptions`. Default: `false`.
+- `isolate?: boolean | IsolateOptions` in `BaseOptions` (src/options.ts), inherited by `KaukauOptions`, so a set can override it through `kaukauOptions`. Default: `false`. **(changed)** The first version typed it as `boolean` in `BaseOptions` and as an object in `KaukauOptions`, which TypeScript rejects (`KaukauOptions extends BaseOptions` cannot widen a property), so both use the same type and a set can also use the object form.
   - `true`: isolated children with the parent's `process.execArgv`.
-  - object form: also `require` (modules preloaded in the child as `--require`, e.g. `ts-node/register`) and extra `execArgv` (e.g. `--max-old-space-size=4096`, `--import ...`).
-- CLI: `--isolate` / `--no-isolate`. The CLI's existing `--require` list is forwarded to `isolate.require` when isolation is on (change in bin/start.js, maintainer side).
-- `Kaukau#isolate(): { require: string[]; execArgv: string[] } | null` accessor, like the other getters.
+  - object form `IsolateOptions`: `require` (modules preloaded in the child as `--require`, e.g. `ts-node/register`; array **or comma separated string**, like the CLI) and `execArgv` (extra Node.js arguments, e.g. `--max-old-space-size=4096`, `--import ...`; an array, strings are never split on commas).
+  - The option is normalized when parsed (`parseKaukauOptions`): objects keep their normalized `require`/`execArgv` lists, any other value becomes a boolean. It is not part of the default options, so `defineConfig` does not add an `isolate` key unless it is set.
+- CLI: `--isolate` / `--no-isolate`. The CLI's existing `--require` list is forwarded to `isolate.require` when isolation is on (change in bin/start.js, maintainer side). A configuration file with `"isolate": true` already works without it.
+- `Kaukau#isolate(): ResolvedIsolateOptions | null` accessor (`{ require: string[]; execArgv: string[] }`), like the other getters, and a `resolveIsolate()` helper in `src/parse-options.ts`. `IsolateOptions` and `ResolvedIsolateOptions` are exported from `src/index.ts`.
 - Semver: minor release (6.1.0), no breaking change.
 
 ## 5. Architecture
@@ -76,7 +77,7 @@ New entry `src/isolation/child.ts` (emitted as `lib/isolation/child.js`, CommonJ
 ### What stays in the parent
 
 - The user-facing emitter, all `setting*` / `add file` events, and `done`.
-- The parent `KaukauLogger` (`setting*` logs, `ALL DONE`). It keeps tracking indentation from forwarded events, but **does not print the `Test n° x` / `Test n° x done` lines** (new logger option `printRunEvents`, default `true`, `false` for the parent in isolated mode). The child prints them, so they are ordered with the reporter output of the same process.
+- The parent `KaukauLogger` (`setting*` logs, `ALL DONE`). It keeps tracking indentation from forwarded events, but **does not print the `Test n° x` / `Test n° x done` lines** (logger option `printRunEvents`, default `true`, switched off for the parent while an isolated set runs). The child prints them, so they are ordered with the reporter output of the same process. **(changed)** The logger is created once per run but the mode is chosen per set, so besides the constructor option it has `setPrintRunEvents(bool)` and `isPrintingRunEvents()`; `runInChild` turns the lines off for the duration of the set and restores the previous value afterwards.
 - `createStatsCollector(emitter)`: it only needs event names and `suite.root`, so `ALL DONE - x/y passing` keeps working on forwarded events.
 
 ## 6. IPC protocol
@@ -95,12 +96,12 @@ Parent side, per set: `fork`, wait for `ready`, send `run`, re-emit events on th
 
 ### Lifecycle and failure handling
 
-- **Result vs exit race:** the `result` message is authoritative. If the child exits first, wait one tick (`setImmediate`) before concluding it crashed. Validate on Windows.
+- **Result vs exit race:** the `result` message is authoritative. **(changed)** Instead of waiting one tick after `exit`, the parent finishes once it has seen both `exit` and `disconnect` (the IPC channel is closed after the last message was read), so no message can be lost.
 - **Crash, `process.exit()` in a test, OOM, signal (no `result`):** log with `logger.error` including `code` / `signal`, count it as **1 failure** so `exitOnFail` and the exit code behave. (Today a loading error is an unhandled rejection that kills the run; decide whether to keep that for parity.)
 - **`error` message:** log it and count 1 failure for the set.
 - **Parent killed (e.g. `bin/watch.js` calls `cp.kill()` on the CLI process, which on Windows does not kill the grandchild):** the child listens to `process.on('disconnect', () => process.exit(1))`.
-- **SIGINT / SIGTERM in the parent:** forward to the running child and let the loop stop.
-- **Child never exits (leaked handles):** after `result` is flushed the child calls `process.exit()` itself. The parent adds a safety `kill()` after a grace period.
+- **SIGINT / SIGTERM in the parent:** **(changed)** no forwarding. A signal handler in the parent would stop Ctrl+C from ending it, and the cases are already covered: Ctrl+C is delivered to the child too (same process group), and if the parent is killed the channel closes and the child exits through the `disconnect` handler above.
+- **Child never exits (leaked handles):** after `result` is flushed the child flushes stdout/stderr and calls `process.exit()` itself. The parent adds a safety `kill()` after a grace period (5 s).
 
 ## 7. Serialization
 
@@ -115,20 +116,20 @@ Parent -> child payload (`paramsSet`, `mochaOptions`, `tester.requestInit`) must
 
 ## 8. Implementation steps (src/)
 
-1. **Types and options**
-   - `src/options.ts`: `isolate` on `KaukauOptions` and `BaseOptions`, plus an `IsolateOptions` type.
-   - `src/parse-options.ts`: add `ISOLATE` to the table (kept as a boolean or an object, not blindly `!!`-coerced), default `false`; export it in `ParsedKaukauOptions`.
+1. **Types and options** (done)
+   - `src/options.ts`: `isolate` on `BaseOptions` (inherited by `KaukauOptions`), plus the `IsolateOptions` and `ResolvedIsolateOptions` types.
+   - `src/parse-options.ts`: add `ISOLATE` to the table (kept as a boolean or a normalized object, not blindly `!!`-coerced), no default; `ParsedKaukauOptions.isolate`; `resolveIsolate()`.
    - `src/kaukau.ts`: `isolate()` accessor.
-2. **Logger**: `KaukauLoggerOptions.printRunEvents` (default `true`); when `false`, still track indent but skip the `Test n°` logs.
-3. **Refactor `src/kaukau.ts`**: extract `prepareSet()` and `executeInProcess()` from `runMocha` with **no behaviour change**; verify with the existing scripts before adding anything else.
-4. **`src/isolation/protocol.ts`**: message types shared by parent and child.
-5. **`src/isolation/serialize.ts`**: serialize/deserialize for runnables, suites and errors.
-6. **`src/isolation/child.ts`**: child entry (section 5).
-7. **`src/isolation/run-in-child.ts`**: `runInChild(prepared, options): Promise<number>` (fork, handshake, event forwarding, lifecycle, signals, validation).
-8. **`src/kaukau.ts`**: choose the mode per set; `__dirname`-based path to `isolation/child.js` (the project is CommonJS, so `__dirname` is available).
-9. **`src/index.ts`**: export `IsolateOptions`.
+2. **Logger** (done): `KaukauLoggerOptions.printRunEvents` (default `true`), `setPrintRunEvents()` and `isPrintingRunEvents()`; when off, still track indent but skip the `Test n°` logs.
+3. **Refactor `src/kaukau.ts`** (done): extract `prepareSet()` and `executeInProcess()` from `runMocha` with **no behaviour change**. `PreparedSet` lives in `src/prepared-set.ts`. **(changed)** `executeInProcess`, the Mocha runner events list and the `createStatsCollector` typing moved to `src/execute.ts` so the child process reuses them. Two small differences: the `add file` events of all files are now emitted before `setting mocha end` (a missing file still crashes at `require.resolve`, now after `setting end`), and a failure while loading the files rejects the promise instead of throwing inside a `.then` handler (still an unhandled rejection in-process, but the child can report it).
+4. **`src/isolation/protocol.ts`** (done): message types shared by parent and child.
+5. **`src/isolation/serialize.ts`** (done): serialize/deserialize for runnables, suites and errors (`cause` and `errors` included), and `assertCloneable` which names the offending property (e.g. `parameters.credentials.check`).
+6. **`src/isolation/child.ts`** (done): child entry (section 5).
+7. **`src/isolation/run-in-child.ts`** (done): `runInChild(prepared, isolate, context): Promise<number>` (fork, handshake, event forwarding, lifecycle, validation; no signal forwarding, see section 6).
+8. **`src/kaukau.ts`** (done): `executeSet()` chooses the mode per set from `prepared.isolate`; the child path is `path.join(__dirname, 'child.js')` in `run-in-child.ts` (the project is CommonJS, so `__dirname` is available).
+9. **`src/index.ts`** (done): export `IsolateOptions` and `ResolvedIsolateOptions`.
 
-Outside src/ (maintainer): `bin/start.js` (`--isolate` / `--no-isolate`, forward `--require`), package.json (`engines` unchanged, nothing new to install), README (document `isolate`, and point the "ES modules in .js" section at it), tests below.
+Status of what is left outside `src/` (maintainer): `bin/start.js` (`--isolate` / `--no-isolate`, forward `--require`), rebuilding `lib/` (the child runs `lib/isolation/child.js`), package.json (`engines` unchanged, nothing new to install), tests under `test/` (section 10). The README is done.
 
 ## 9. Edge cases to decide or verify
 
@@ -142,16 +143,19 @@ Outside src/ (maintainer): `bin/start.js` (`--isolate` / `--no-isolate`, forward
 
 ## 10. Verification
 
-1. `npx tsc --noEmit` passes.
-2. Regression, in-process mode: `npm run cmd`, `cmd:esm`, `cmd:esm1`, `test`, `test:esm`, `test:esm1` give the same results as before the refactor.
-3. The PROBLEM 1 reproduction (`webph.2.spec.js` with `import { expect } from "chai"`) with `isolate: true`: 5 tests run (3 in set 2, including "Route 1 sub2 spec"), where in-process mode runs 4.
-4. Output parity: reporter output, indentation, `Test n° x` lines, `ALL DONE` count, exit code with and without failures.
-5. `exitOnFail` stops after the first failing set in isolated mode.
-6. Crash cases: `process.exit(3)` in a test, an uncaught exception at load, a missing file, an infinite handle: each yields a logged error, a counted failure and no hang.
-7. Cloning errors: a function inside `parameters` gives the explicit error before spawning.
-8. Listeners: `fail` / `pass` / `done` events receive usable copies.
-9. Watch mode (`npm run watch`): killing the CLI does not leave an orphan child.
-10. Windows and Linux, on Node 20.19, 22.12 and 24.
+Checked with throwaway scripts against a temporary build (items marked "checked"); the others need the real scripts and the CLI flags:
+
+1. `npx tsc --noEmit` passes (checked).
+2. Regression, in-process mode: `npm run cmd`, `cmd:esm`, `cmd:esm1`, `test`, `test:esm`, `test:esm1` give the same results as before the refactor. (Only a small in-process scenario with ESM test files was checked, the npm scripts were not run.)
+3. The PROBLEM 1 reproduction with `isolate: true` (checked with an ESM-syntax `.js` file next to a CommonJS one, 2 sets: everything runs in both sets, where in-process mode skips the ESM file in set 2). With `webph.2.spec.js` using `import { expect } from "chai"` it should run 5 tests (3 in set 2, including "Route 1 sub2 spec"), where in-process mode runs 4.
+4. Output parity: reporter output, indentation, `Test n° x` lines (checked: printed once per set), `ALL DONE` count (checked), exit code with and without failures.
+5. `exitOnFail` stops after the first failing set in isolated mode (checked).
+6. Crash cases: `process.exit(3)` in a test (checked), a missing file (checked); still to check: an uncaught exception at load and an infinite handle: each should yield a logged error, a counted failure and no hang.
+7. Cloning errors: a function inside `parameters` gives the explicit error before spawning, naming the property (checked).
+8. Listeners: `fail` / `pass` / `pending` / `retry` / `hook` / `end` events receive usable copies (checked), `done` carries the total failures (checked).
+9. Per-set override (`kaukauOptions: { isolate: true }`) (checked).
+10. Watch mode (`npm run watch`): killing the CLI does not leave an orphan child.
+11. Windows (checked on Windows only) and Linux, on Node 20.19, 22.12 and 24.
 
 ## 11. Rollout
 

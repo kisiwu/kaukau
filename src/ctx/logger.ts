@@ -24,12 +24,17 @@ const {
 export interface KaukauLoggerOptions {
   enableLogs?: boolean;
   logLevel?: LogLevel;
+  /**
+   * Print the `Test n° x` / `Test n° x done` lines when a run begins/ends. Default: `true`.
+   */
+  printRunEvents?: boolean;
 }
 
 // this reporter outputs test results, indenting two spaces per suite
 export class KaukauLogger {
   private _indents = 0;
   private _enableLogs: boolean;
+  private _printRunEvents: boolean;
   private _logger: ReturnType<typeof Logger.createLogger>;
 
   /**
@@ -37,6 +42,7 @@ export class KaukauLogger {
    */
   constructor(runner: KaukauEmitter, options: KaukauLoggerOptions = {}) {
     this._enableLogs = options.enableLogs !== false;
+    this._printRunEvents = options.printRunEvents !== false;
 
     this._logger = Logger.createLogger({
       write: this._writeLine.bind(this),
@@ -95,10 +101,10 @@ export class KaukauLogger {
         debugEvents.info('success', `setting test n° ${count} done`);
       })
       .on(EVENT_RUN_BEGIN, ({ count }: RunnerEventPayload) => {
-        this.write('info', 'Test n°', count);
+        if (this._printRunEvents) this.write('info', 'Test n°', count);
       })
       .on(EVENT_RUN_END, ({ count }: RunnerEventPayload) => {
-        this.write('info', 'Test n°', count, 'done');
+        if (this._printRunEvents) this.write('info', 'Test n°', count, 'done');
       })
       .on('done', () => {
         let status: 'success' | 'warn' = 'success';
@@ -112,6 +118,14 @@ export class KaukauLogger {
 
   enableLog(bool?: unknown): void {
     this._enableLogs = !!bool;
+  }
+
+  setPrintRunEvents(bool?: unknown): void {
+    this._printRunEvents = !!bool;
+  }
+
+  isPrintingRunEvents(): boolean {
+    return this._printRunEvents;
   }
 
   indent(): string {

@@ -7,10 +7,12 @@ Node.js test tools: a [Mocha](https://mochajs.org/) wrapper with sets of paramet
 - [CLI](#cli)
 - [Programmatic usage](#programmatic-usage)
 - [Configuration](#configuration)
+- [Isolating sets of parameters (`isolate`)](#isolating-sets-of-parameters-isolate)
 - [Helpers (`this.ctx.kaukau`)](#helpers-thisctxkaukau)
 - [TypeScript](#typescript)
 - [Migrating to v6](#migrating-to-v6)
 - [References](#references)
+- [Known limitation: ES modules in `.js` test files](#known-limitation-es-modules-in-js-test-files)
 
 ## Install
 
@@ -138,7 +140,7 @@ import { Kaukau } from 'kaukau';
 | Event | Arguments |
 |---|---|
 | `setting`, `setting tester`, `setting options`, `setting options end`, `setting mocha`, `setting mocha end`, `setting end`, `add file` | an object with `count` (the number of the set of parameters running), `logger` and event specific properties |
-| all [Mocha runner events](https://mochajs.org/api/runner) | the Mocha arguments followed by `{ count, logger }` |
+| all [Mocha runner events](https://mochajs.org/api/runner) | the Mocha arguments followed by `{ count, logger }`. With [`isolate`](#isolating-sets-of-parameters-isolate), tests, hooks, suites and errors are **read-only copies** |
 | `done` | `totalFailures` (number) |
 
 ## Configuration
@@ -152,6 +154,7 @@ A configuration file is a JSON file, or a `.js`/`.mjs`/`.cjs` module exporting t
 | `exitOnFail` | `boolean` | Do not execute the next sets of parameters if a set has a failing test | `false` |
 | `files` | `string \| string[]` | Files and/or directories to be loaded for execution | `[]` |
 | `ext` | `string \| string[]` | File extensions to be loaded when `files` contains directories | `['.js', '.mjs', '.cjs']` |
+| `isolate` | `boolean \| object` | Run each set of parameters in its own child process. See [Isolating sets of parameters](#isolating-sets-of-parameters-isolate) | `false` |
 | `options` | `object` | [Mocha options](https://mochajs.org/api/mocha) | `{}` |
 | `parameters` | `object \| object[]` | Sets of [parameters](#parameters) | `[{}]` |
 
@@ -166,6 +169,7 @@ Example:
   "exitOnFail": false,
   "files": [], // e.g.: ["tests/test01.js", "tests/more/"]
   "ext": [".js", ".mjs", ".cjs"],
+  "isolate": false,
 
   /* mocha options */
   "options": {
@@ -210,6 +214,53 @@ import { defineParameters } from 'kaukau/config';
 export default defineParameters([{ host: 'https://example.com' }]);
 ```
 
+## Isolating sets of parameters (`isolate`)
+
+By default, all the sets of `parameters` run in the **same Node.js process**: the test files are loaded again for each set, but modules, globals, `process.env` changes, timers and open handles can leak from one set to the next. Some files are not even re-executed (see [ES modules in `.js` test files](#known-limitation-es-modules-in-js-test-files)).
+
+With `isolate`, **each set runs in its own child process**, so nothing is shared between sets and every test file is executed for every set.
+
+```jsonc
+{
+  "files": ["tests/"],
+  "isolate": true,
+  "parameters": [{ "host": "https://a.example.com" }, { "host": "https://b.example.com" }]
+}
+```
+
+`isolate` is `false` by default. It accepts:
+
+- `true`: one child process per set, started with the same Node.js arguments as the main process.
+- an object to customize the child process:
+
+  | Property | Type | Description |
+  |---|---|---|
+  | `require` | `string \| string[]` | Modules to preload in the child process (`--require`), e.g. `ts-node/register`. Comma separated or array |
+  | `execArgv` | `string[]` | Extra Node.js arguments, e.g. `["--max-old-space-size=4096", "--import", "./setup.mjs"]` |
+
+A set can enable or disable it for itself with `kaukauOptions`:
+
+```jsonc
+{
+  "isolate": false,
+  "parameters": [
+    { "id": 1 },
+    { "id": 2, "kaukauOptions": { "isolate": true } } // only this set runs in a child process
+  ]
+}
+```
+
+The CLI starts the tests the same way, so set `isolate` in your configuration file (`kaukau --config kaukau-config.json`).
+
+### What changes when a set is isolated
+
+- **Same results and output.** Reporters, `this.ctx.kaukau` (`params`, `logger`, `tester`), the `Test n° x` lines, the `ALL DONE` summary, `exitOnFail` and the exit code behave as usual.
+- **Listeners get read-only copies.** In `.on('pass' | 'fail' | 'test' | ...)` listeners, tests, hooks and suites are copies of the Mocha objects, not the live ones. You can read `title`, `fullTitle()`, `titlePath()`, `state`, `file`, `duration`, `speed`, `pending`, `parent`, `err` (and `isPending()`, `isFailed()`, `isPassed()`), but you cannot change them or call other Mocha methods. Errors are real `Error` objects that keep their own properties (`code`, `actual`, `expected`, `cause`, ...); values that cannot be copied (functions, circular references) are replaced by a string.
+- **Data sent to the child must be plain data.** The set of parameters, `mochaOptions` and the `tester` request defaults are copied to the child process, so they cannot contain functions or class instances. Kaukau stops with an explicit error naming the property (e.g. `"isolate": "parameters.credentials.check" cannot be sent to the child process`). Use module names or paths instead, for example `reporter: "spec"` or `reporter: "./my-reporter.js"`.
+- **Changes made to `tester` or in the tests stay in the child.** Only what was set before the tests start (`setting tester` listeners, parameters) is passed on.
+- **A child that dies counts as 1 failure.** If a test calls `process.exit()`, crashes or runs out of memory, the error is logged and the set is counted as failed (so `exitOnFail` applies).
+- **It costs more.** Each set starts a new Node.js process and loads Mocha and your dependencies again, roughly 0.2 to 0.6 seconds and 50 to 100 MB of extra memory while it runs (the main process stays idle). It is negligible for tests that mostly wait for the network, and noticeable for very fast unit tests. Prefer enabling it only for the sets that need it.
+
 ## Helpers (`this.ctx.kaukau`)
 
 In your test files, kaukau adds helpers to the Mocha context: `this.ctx.kaukau` contains `params` (also `parameters`), `logger` (also `log`) and `tester`.
@@ -239,7 +290,7 @@ describe('test 01', function () {
 
 A set of parameters can overwrite the main configuration with `kaukauOptions` and `mochaOptions`:
 
-- `kaukauOptions` can overwrite `files` and `ext`.
+- `kaukauOptions` can overwrite `files`, `ext` and `isolate`.
 - `mochaOptions` can overwrite any [Mocha option](https://mochajs.org/api/mocha).
 
 Parameters can also be loaded from files with `--parameters <file|folder>` (one set per file, `.json`, `.js`, `.mjs` or `.cjs`).
@@ -339,6 +390,7 @@ import type {
   KaukauConfig,
   IParameters,
   BaseOptions,
+  IsolateOptions,
   LogLevel,
   Runner,
   KaukauContext,
@@ -377,7 +429,9 @@ When you define **several sets of `parameters`**, kaukau loads your test files a
 - **`.mjs` files** are re-executed for every set.
 - **`.js` files that use ESM syntax** (`import`/`export`, with or without `"type": "module"` in `package.json`) are executed **only for the first set**. Node loads them through `require(esm)` and caches them, so the next sets silently skip them and their tests do not run.
 
-Do not mix ESM syntax into `.js` test files:
+The simplest fix is to enable [`isolate`](#isolating-sets-of-parameters-isolate): each set then runs in its own process and every file, whatever its syntax, is executed for every set.
+
+If you prefer not to isolate the sets, do not mix ESM syntax into `.js` test files:
 
 ```diff
 - // tests/example.js

@@ -1,12 +1,12 @@
-import Mocha from 'mocha';
 import type { MochaOptions } from 'mocha';
-import * as statsCollector from 'mocha/lib/stats-collector';
 import { EventEmitter } from 'events';
 import * as fs from 'fs';
 import * as path from 'path';
 import { KaukauLogger } from './ctx/logger';
 import type { KaukauLoggerOptions } from './ctx/logger';
 import { Tester } from './ctx/tester';
+import { createStatsCollector, executeInProcess } from './execute';
+import { runInChild } from './isolation/run-in-child';
 import type {
   KaukauContext,
   KaukauEmitter,
@@ -19,11 +19,12 @@ import type {
   SettingEndEvent,
   AddFileEvent,
 } from './events';
-import type { KaukauOptions, LogLevel } from './options';
+import type { KaukauOptions, LogLevel, ResolvedIsolateOptions } from './options';
 import { Parameters } from './parameters';
-import { parseKaukauOptions, parseMochaOptions, parseOptions } from './parse-options';
+import { parseKaukauOptions, parseMochaOptions, parseOptions, resolveIsolate } from './parse-options';
 import type { ParsedKaukauOptions } from './parse-options';
 import type { Runner } from './runner';
+import type { PreparedSet } from './prepared-set';
 
 declare global {
   namespace Mocha {
@@ -32,50 +33,6 @@ declare global {
     }
   }
 }
-
-// @types/mocha declares `loadFilesAsync(): Promise<void>` without the `esmDecorator` option
-type MochaWithEsmDecorator = Omit<Mocha, 'loadFilesAsync'> & {
-  loadFilesAsync(options?: { esmDecorator?: (file: string) => string }): Promise<void>;
-};
-
-// mocha >= 11 exposes `createStatsCollector` as a named export, but @types/mocha still declares a single `export =`
-const { createStatsCollector } = statsCollector as unknown as {
-  createStatsCollector: (runner: Mocha.Runner) => void;
-};
-
-const {
-  EVENT_RUN_BEGIN,
-  EVENT_RUN_END,
-  EVENT_TEST_FAIL,
-  EVENT_TEST_PASS,
-  EVENT_SUITE_BEGIN,
-  EVENT_SUITE_END,
-  EVENT_DELAY_BEGIN,
-  EVENT_DELAY_END,
-  EVENT_HOOK_BEGIN,
-  EVENT_HOOK_END,
-  EVENT_TEST_BEGIN,
-  EVENT_TEST_END,
-  EVENT_TEST_PENDING,
-  EVENT_TEST_RETRY,
-} = Mocha.Runner.constants;
-
-const MOCHA_RUNNER_EVENTS = [
-  EVENT_RUN_BEGIN,
-  EVENT_RUN_END,
-  EVENT_TEST_FAIL,
-  EVENT_TEST_PASS,
-  EVENT_SUITE_BEGIN,
-  EVENT_SUITE_END,
-  EVENT_DELAY_BEGIN,
-  EVENT_DELAY_END,
-  EVENT_HOOK_BEGIN,
-  EVENT_HOOK_END,
-  EVENT_TEST_BEGIN,
-  EVENT_TEST_END,
-  EVENT_TEST_PENDING,
-  EVENT_TEST_RETRY,
-];
 
 // List files in a directory recursively, in a synchronous way
 function listFilesRecSync(dir: string, filelist: string[] = [], subdir = ''): string[] {
@@ -123,6 +80,13 @@ export class Kaukau {
     return this.#parsedOptions.kaukau.exitOnFail ?? false;
   }
 
+  /**
+   * Settings of the child process each set of parameters runs in, or `null` if the isolation is disabled.
+   */
+  isolate(): ResolvedIsolateOptions | null {
+    return resolveIsolate(this.#parsedOptions.kaukau.isolate);
+  }
+
   enableLogs(): boolean {
     return this.#parsedOptions.kaukau.enableLogs ?? true;
   }
@@ -153,160 +117,136 @@ export class Kaukau {
 
     let totalFailures = 0;
 
-    // function to run Mocha testing, resolves with the number of failures
-    const runMocha = (): Promise<number> =>
-      new Promise<number>((resolve) => {
-        // set next parameters for the next test
-        const count = c.next() ?? 0;
+    // sets up the next set of parameters and resolves the files to load (nothing is loaded here)
+    const prepareSet = (): PreparedSet => {
+      // set next parameters for the next test
+      const count = c.next() ?? 0;
 
-        emitter.emit('setting', { count, logger: log } satisfies SettingEvent);
+      emitter.emit('setting', { count, logger: log } satisfies SettingEvent);
 
-        const params = c.get;
+      const params = c.get;
 
-        const tester = new Tester();
+      const tester = new Tester();
 
-        emitter.emit('setting tester', {
-          logger: log,
-          count,
-          params,
-          tester,
-        } satisfies SettingTesterEvent);
+      emitter.emit('setting tester', {
+        logger: log,
+        count,
+        params,
+        tester,
+      } satisfies SettingTesterEvent);
 
-        emitter.emit('setting options', {
-          logger: log,
-          count,
-          params,
-        } satisfies SettingOptionsEvent);
+      emitter.emit('setting options', {
+        logger: log,
+        count,
+        params,
+      } satisfies SettingOptionsEvent);
 
-        const kaukauOptions = parseKaukauOptions(
-          c.get('kaukauOptions') as object | undefined,
-          this.#parsedOptions.kaukau
-        );
-        const mochaOptions = parseMochaOptions(
-          c.get('mochaOptions') as MochaOptions | undefined,
-          this.#parsedOptions.mocha
-        );
+      const kaukauOptions = parseKaukauOptions(
+        c.get('kaukauOptions') as object | undefined,
+        this.#parsedOptions.kaukau
+      );
+      const mochaOptions = parseMochaOptions(
+        c.get('mochaOptions') as MochaOptions | undefined,
+        this.#parsedOptions.mocha
+      );
 
-        const kaukauOptionsParams = new Parameters(kaukauOptions);
-        kaukauOptionsParams.next();
-        const mochaOptionsParams = new Parameters(mochaOptions);
-        mochaOptionsParams.next();
+      const kaukauOptionsParams = new Parameters(kaukauOptions);
+      kaukauOptionsParams.next();
+      const mochaOptionsParams = new Parameters(mochaOptions);
+      mochaOptionsParams.next();
 
-        emitter.emit('setting options end', {
-          logger: log,
-          count,
-          kaukauOptions: kaukauOptionsParams.get,
-          mochaOptions: mochaOptionsParams.get,
-          params,
-        } satisfies SettingOptionsEndEvent);
+      emitter.emit('setting options end', {
+        logger: log,
+        count,
+        kaukauOptions: kaukauOptionsParams.get,
+        mochaOptions: mochaOptionsParams.get,
+        params,
+      } satisfies SettingOptionsEndEvent);
 
-        emitter.emit('setting mocha', {
-          logger: log,
-          count,
-          params,
-        } satisfies SettingMochaEvent);
+      emitter.emit('setting mocha', {
+        logger: log,
+        count,
+        params,
+      } satisfies SettingMochaEvent);
 
-        // Instantiate a Mocha instance.
-        const mocha = new Mocha(mochaOptions);
+      const files: string[] = [];
 
-        let files = 0;
+      const addFile = (filename: string, errorMessage?: string): void => {
+        emitter.emit('add file', { filename, errorMessage, logger: log } satisfies AddFileEvent);
+        files.push(filename);
+      };
 
-        const addFile = (filename: string, errorMessage?: string): void => {
-          emitter.emit('add file', { filename, errorMessage, logger: log } satisfies AddFileEvent);
+      // only import the mentioned files
+      (kaukauOptions.files ?? []).forEach((file) => {
+        // avoid unstoppable loop
+        if (!file) {
+          return;
+        }
 
-          // delete cached file if it was previously required
-          delete require.cache[require.resolve(filename)];
+        const filename = path.resolve(file);
 
-          // add file to Mocha instance
-          mocha.addFile(filename);
-
-          files += 1;
-        };
-
-        // only import the mentioned files
-        (kaukauOptions.files ?? []).forEach((file) => {
-          // avoid unstoppable loop
-          if (!file) {
-            return;
-          }
-
-          const filename = path.resolve(file);
-
-          // if the path does not exist
-          if (!fs.existsSync(filename)) {
-            const errorMessage = `no such file or directory - stat "${filename}"`;
-            addFile(filename, errorMessage);
-          }
-          // else if the path is a directory
-          else if (fs.statSync(filename).isDirectory()) {
-            // Searching ext files in directory
-            const exts = kaukauOptions.ext ?? [];
-            const subfiles = listFilesRecSync(filename).filter((subfile) =>
-              exts.some((ext) => subfile.endsWith(ext))
-            );
-
-            subfiles.forEach((subfile) => {
-              addFile(path.resolve(path.join(filename, subfile)));
-            });
-          }
-          // else if the path is a file
-          else {
-            addFile(filename);
-          }
-        });
-
-        emitter.emit('setting mocha end', {
-          logger: log,
-          count,
-          files,
-          params,
-        } satisfies SettingMochaEndEvent);
-        emitter.emit('setting end', {
-          logger: log,
-          count,
-          params,
-        } satisfies SettingEndEvent);
-
-        // add context to parent suite
-        mocha.suite.ctx.kaukau = {
-          logger: log,
-          log,
-          parameters: params,
-          params,
-          tester,
-        };
-
-        // handles ESM modules
-        const timestamp = Date.now();
-        (mocha as MochaWithEsmDecorator)
-          .loadFilesAsync({
-            esmDecorator: (file) => `${file}?v=${timestamp}`,
-          })
-          .then(
-            () => {
-              const mochaRunner = mocha.run((failures) => {
-                resolve(failures);
-              });
-              // listen to Mocha.Runner's events
-              MOCHA_RUNNER_EVENTS.forEach((evnt) => {
-                if (evnt) {
-                  mochaRunner.on(evnt, (...args: unknown[]) => {
-                    emitter.emit(evnt, ...args, { count, logger: log });
-                  });
-                }
-              });
-            },
-            (err) => {
-              throw err;
-            }
+        // if the path does not exist
+        if (!fs.existsSync(filename)) {
+          const errorMessage = `no such file or directory - stat "${filename}"`;
+          addFile(filename, errorMessage);
+        }
+        // else if the path is a directory
+        else if (fs.statSync(filename).isDirectory()) {
+          // Searching ext files in directory
+          const exts = kaukauOptions.ext ?? [];
+          const subfiles = listFilesRecSync(filename).filter((subfile) =>
+            exts.some((ext) => subfile.endsWith(ext))
           );
+
+          subfiles.forEach((subfile) => {
+            addFile(path.resolve(path.join(filename, subfile)));
+          });
+        }
+        // else if the path is a file
+        else {
+          addFile(filename);
+        }
       });
+
+      emitter.emit('setting mocha end', {
+        logger: log,
+        count,
+        files: files.length,
+        params,
+      } satisfies SettingMochaEndEvent);
+      emitter.emit('setting end', {
+        logger: log,
+        count,
+        params,
+      } satisfies SettingEndEvent);
+
+      return {
+        count,
+        params,
+        tester,
+        kaukauOptions,
+        mochaOptions,
+        files,
+        isolate: resolveIsolate(kaukauOptions.isolate),
+      };
+    };
+
+    // runs the set in a child process if it is isolated, in the current process otherwise
+    const executeSet = (prepared: PreparedSet): Promise<number> =>
+      prepared.isolate
+        ? runInChild(prepared, prepared.isolate, {
+            emitter,
+            logger: log,
+            enableLogs: this.enableLogs(),
+            logLevel: this.logLevel(),
+          })
+        : executeInProcess(prepared, { emitter, log });
 
     // run Mocha as many time as there are parameters (if parameters is array),
     // started on a later tick so listeners can be attached to the returned emitter
     setImmediate(async () => {
       for (let i = 0; i < c.size(); i++) {
-        const failures = await runMocha();
+        const failures = await executeSet(prepareSet());
 
         totalFailures += failures || 0;
 

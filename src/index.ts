@@ -2,7 +2,14 @@ export { Kaukau } from './kaukau';
 export { defineConfig, defineParameters } from './config';
 export type { KaukauConfig } from './config';
 export type { Runner } from './runner';
-export type { KaukauOptions, BaseOptions, IParameters, LogLevel } from './options';
+export type {
+  KaukauOptions,
+  BaseOptions,
+  IParameters,
+  IsolateOptions,
+  LogLevel,
+  ResolvedIsolateOptions,
+} from './options';
 export type {
   AddFileEvent,
   KaukauContext,

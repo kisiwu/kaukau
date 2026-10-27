@@ -2,6 +2,25 @@ import type { MochaOptions } from 'mocha';
 
 export type LogLevel = 'error' | 'warn' | 'info' | 'verbose' | 'debug' | 'trace' | number;
 
+export interface IsolateOptions {
+    /**
+     * Modules preloaded in the child process (as `--require`), e.g. `ts-node/register`. Comma (`,`) separated or array.
+     */
+    require?: string | string[];
+    /**
+     * Extra Node.js arguments for the child process, e.g. `['--max-old-space-size=4096']`.
+     */
+    execArgv?: string[];
+}
+
+/**
+ * Isolation settings once normalized.
+ */
+export interface ResolvedIsolateOptions {
+    require: string[];
+    execArgv: string[];
+}
+
 export interface BaseOptions {
     /**
      * Comma (`,`) separated or array of file extensions to be loaded if files contains path to directories. Default: `['.js', '.mjs', '.cjs']`.
@@ -12,6 +31,12 @@ export interface BaseOptions {
      * Files and/or directories to be loaded for execution. Default: `[]`.
      */
     files?: string | string[];
+
+    /**
+     * Run each set of parameters in its own child process, so modules (CommonJS and ES modules) and global state are never shared between sets.
+     * Use an object to customize the child process. Default: `false`.
+     */
+    isolate?: boolean | IsolateOptions;
 }
 
 export interface IParameters {
