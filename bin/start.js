@@ -1,4 +1,4 @@
-const { Kaukau } = require('../index'),
+const { Kaukau } = require('../lib/index'),
   { Logger } = require('@novice1/logger'),
   debug = Logger.debugger('kaukau:cmd:start'),
   fs = require('fs'),
