@@ -210,6 +210,20 @@ kaukau --require ts-node/register --file test/example.test.ts
 
 > 💡 This enables TypeScript support via `ts-node`, and provides the necessary type definitions for Mocha-style tests.
 
+### TypeScript
+
+To get types for `this.ctx.kaukau` in your test files, add `kaukau` to `types` in your `tsconfig.json`:
+
+```json
+{
+  "compilerOptions": {
+    "types": ["node", "mocha", "kaukau"]
+  }
+}
+```
+
+Or add a file such as `kaukau.d.ts` that contains `import 'kaukau';`.
+
 ## Reference
 
 - [mocha](https://mochajs.org/)

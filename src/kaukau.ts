@@ -31,11 +31,12 @@ declare global {
       kaukau: KaukauContext;
     }
   }
-
-  interface Mocha {
-    loadFilesAsync(options: { esmDecorator?: (file: string) => string }): Promise<void>;
-  }
 }
+
+// @types/mocha declares `loadFilesAsync(): Promise<void>` without the `esmDecorator` option
+type MochaWithEsmDecorator = Omit<Mocha, 'loadFilesAsync'> & {
+  loadFilesAsync(options?: { esmDecorator?: (file: string) => string }): Promise<void>;
+};
 
 // mocha >= 11 exposes `createStatsCollector` as a named export, but @types/mocha still declares a single `export =`
 const { createStatsCollector } = statsCollector as unknown as {
@@ -277,7 +278,7 @@ export class Kaukau {
 
         // handles ESM modules
         const timestamp = Date.now();
-        mocha
+        (mocha as MochaWithEsmDecorator)
           .loadFilesAsync({
             esmDecorator: (file) => `${file}?v=${timestamp}`,
           })
