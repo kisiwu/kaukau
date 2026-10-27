@@ -154,8 +154,13 @@ export class KaukauLogger {
     this.write('success', ...args);
   }
 
-  _writeLine({ message, prefixText }: { message: string; prefixText: string }): void {
-    process.stdout.write(`${this.indent()}kaukau ${prefixText} : ${message}\n`);
+  protected _writeLine({ message, prefixText, level }: { message: string; prefixText: string, level: string }): void {
+    const msg = `${this.indent()}kaukau ${prefixText} : ${message}\n`;
+    if (level === 'error') {
+      process.stderr.write(msg);
+    } else {
+      process.stdout.write(msg);
+    }
   }
 
   write(level: string, ...args: unknown[]): void {

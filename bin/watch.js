@@ -23,13 +23,17 @@ function fgColorText(txt, color) {
 }
 
 const customLogger = Logger.createLogger({
-    write({ args }) {
+    write({ args, level }) {
         // Logger.colors.BRIGHT = bold
-        process.stdout.write(
-            bgColorText(' KAUKAU ', Logger.colors.BRIGHT) +
+        const msg = bgColorText(' KAUKAU ', Logger.colors.BRIGHT) +
             ' ' +
             fgColorText(Logger.formatMessage(args, true), Logger.colors.BRIGHT) +
-            '\n');
+            '\n';
+        if (level === 'error') {
+            process.stderr.write(msg);
+        } else {
+            process.stdout.write(msg);
+        }
     }
 });
 // no need for @novice1/logger to 

@@ -1,4 +1,4 @@
-const { Logger } = require('@novice1/logger'),
+const { Logger, Debug: LoggerDebug } = require('@novice1/logger'),
   debug = Logger.debugger('kaukau:cmd:setup'),
   fs = require('fs'),
   path = require('path'),
@@ -58,7 +58,7 @@ function setupFactory(program) {
 
     // --debug
     if (opts.debug) {
-      require('debug').enable('kaukau:*');
+      LoggerDebug.enable('kaukau:*');
     }
 
     // --config

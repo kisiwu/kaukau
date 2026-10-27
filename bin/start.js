@@ -1,5 +1,5 @@
 const { Kaukau } = require('../lib/index'),
-  { Logger } = require('@novice1/logger'),
+  { Logger, Debug: LoggerDebug } = require('@novice1/logger'),
   debug = Logger.debugger('kaukau:cmd:start'),
   fs = require('fs'),
   path = require('path'),
@@ -79,7 +79,7 @@ function startFactory(program) {
 
     // --debug
     if (opts.debug) {
-      require('debug').enable('kaukau:*');
+      LoggerDebug.enable('kaukau:*');
     }
 
     // --require

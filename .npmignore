@@ -3,3 +3,6 @@ todo
 logs
 .vscode
 node_modules
+src/
+tsconfig.json
+*.local.md
