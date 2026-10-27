@@ -1,156 +1,253 @@
 # kaukau
-NodeJS test tools, [Mocha](https://mochajs.org/) wrapper.
 
-ESM support.
+Node.js test tools: a [Mocha](https://mochajs.org/) wrapper with sets of parameters, a logger and a request helper. Supports CommonJS and ESM (config files, parameters files and test files).
+
+- [Install](#install)
+- [Quick start](#quick-start)
+- [CLI](#cli)
+- [Programmatic usage](#programmatic-usage)
+- [Configuration](#configuration)
+- [Helpers (`this.ctx.kaukau`)](#helpers-thisctxkaukau)
+- [TypeScript](#typescript)
+- [Migrating to v6](#migrating-to-v6)
+- [References](#references)
 
 ## Install
 
+`mocha` is a peer dependency, install it alongside kaukau (Node.js `^20.19.0 || >=22.12.0`):
+
 ```bash
-npm install kaukau --save-dev
+npm install kaukau mocha --save-dev
 ```
 
-## Usage
+For TypeScript users, also install the type definitions:
 
-### CLI
+```bash
+npm install @types/mocha @types/node --save-dev
+```
 
-Set up [config](#configuration) file:
+## Quick start
+
+1. Generate a configuration file:
+
+   ```bash
+   kaukau setup --config kaukau-config.json --file tests/
+   ```
+
+2. Write a test, e.g. `tests/example.js`:
+
+   ```js
+   const { expect } = require('chai');
+
+   describe('example', function () {
+     const { params, logger } = this.ctx.kaukau;
+
+     it('should have a host', () => {
+       logger.info('host:', params('host'));
+       expect(params('host')).to.be.a('string');
+     });
+   });
+   ```
+
+3. Add parameters to `kaukau-config.json` (`"parameters": [{ "host": "https://example.com" }]`) and run:
+
+   ```bash
+   kaukau --config kaukau-config.json
+   ```
+
+## CLI
+
+```bash
+kaukau [options]
+kaukau start [options]      # same as above
+kaukau setup [options]      # alias: init
+```
+
+### `kaukau setup`
+
+Creates a configuration file if it does not exist (or is empty).
+
+| Option | Description | Default |
+|---|---|---|
+| `-c, --config <name>` | Configuration file to create (`.json` or `.js`) | `kaukau-config.json` |
+| `-f, --file <name>` | File/folder to put in `files` | |
+
 ```bash
 kaukau setup
-```
-```bash
 kaukau setup --config kaukau-config.js
-```
-```bash
 kaukau setup --config kaukau-config.js --file tests/
 ```
-Run `tests/`:
+
+### `kaukau` / `kaukau start`
+
+| Option | Description |
+|---|---|
+| `-f, --file <name>` | File/folder to be loaded for execution |
+| `--ext <extension>` | File extensions to be loaded (see [`ext`](#configuration)) |
+| `-c, --config <name>` | Configuration file (`.json`, `.js`, `.mjs`, `.cjs`) |
+| `--parameters <name>` | File or folder containing the parameters (`.json`, `.js`, `.mjs`, `.cjs`) |
+| `-r, --require <names>` | Comma separated modules to require before running (e.g. `ts-node/register`) |
+| `--logs` / `--no-logs` | Enable/disable kaukau logs |
+| `--exit-on-fail` / `--no-exit-on-fail` | Stop after the first set of parameters that has a failing test |
+| `--watch <globs...>` | Re-run the tests when these files change |
+| `--ignore` | Do not watch files (overrides `--watch`) |
+| `--debug` | Debug mode |
+| `--directory <name>` | **Deprecated**, use `--file` |
+| `-V, --version` / `-h, --help` | Version / help |
+
+Command line options take precedence over the configuration file.
+
 ```bash
 kaukau --file tests/
-```
-Run custom [config](#configuration):
-```bash
 kaukau --config kaukau-config.js
-```
-Run `tests/` with custom [config](#configuration):
-```bash
 kaukau start --config kaukau-config.js --file tests/
-```
-Other options are available. 
-
-Display help:
-```bash
+kaukau --config kaukau-config.js --parameters parameters/
+kaukau --config kaukau-config.js --watch kaukau-config.js "tests/**/*.js"
 kaukau --help
 ```
 
-### Programmatically
+## Programmatic usage
 
-Run:
 ```js
-const Kaukau = require('kaukau');
+const { Kaukau } = require('kaukau');
 const config = require('./kaukau-config');
 
 const kaukau = new Kaukau(config);
 
 kaukau.run()
   // kaukau events
-  .on('done', function(totalFailures){ /* done testing */ })
+  .on('done', (totalFailures) => { /* done testing */ })
   // mocha events (https://mochajs.org/api/runner)
-  .on('test', function(test) {})
-  .on('test end', function(test) {})
-  .on('pass', function(test) {})
-  .on('fail', function(test, err) {})
-  .on('end', function() {});
+  .on('test', (test) => {})
+  .on('test end', (test) => {})
+  .on('pass', (test) => {})
+  .on('fail', (test, err) => {})
+  .on('end', () => {});
 ```
+
+With ESM / TypeScript:
+
+```js
+import { Kaukau } from 'kaukau';
+```
+
+`run()` returns an event emitter synchronously: attach your listeners right after calling it.
+
+### Events
+
+| Event | Arguments |
+|---|---|
+| `setting`, `setting tester`, `setting options`, `setting options end`, `setting mocha`, `setting mocha end`, `setting end`, `add file` | an object with `count` (the number of the set of parameters running), `logger` and event specific properties |
+| all [Mocha runner events](https://mochajs.org/api/runner) | the Mocha arguments followed by `{ count, logger }` |
+| `done` | `totalFailures` (number) |
 
 ## Configuration
 
-A JSON object with the following properties:
+A configuration file is a JSON file, or a `.js`/`.mjs`/`.cjs` module exporting the configuration object (`module.exports = {...}` or `export default {...}`).
 
-- `enableLogs`: (boolean) Enable/disable kaukau logs. Default: `true`.
+| Property | Type | Description | Default |
+|---|---|---|---|
+| `enableLogs` | `boolean` | Enable/disable kaukau logs | `true` |
+| `logLevel` | `string` | `error`, `warn`, `info`, `verbose`, `debug`, `trace`. See [Logger](#logger) | `verbose` |
+| `exitOnFail` | `boolean` | Do not execute the next sets of parameters if a set has a failing test | `false` |
+| `files` | `string \| string[]` | Files and/or directories to be loaded for execution | `[]` |
+| `ext` | `string \| string[]` | File extensions to be loaded when `files` contains directories | `['.js', '.mjs', '.cjs']` |
+| `options` | `object` | [Mocha options](https://mochajs.org/api/mocha) | `{}` |
+| `parameters` | `object \| object[]` | Sets of [parameters](#parameters) | `[{}]` |
 
-- `logLevel`: (string) `error`, `warn`, `info`, `verbose`, `debug`, `trace`. Default: `verbose`. Learn usage [here](#logger).
-
-- `exitOnFail`: (boolean) Exit after a set of tests fails so it won't execute tests for the next sets of parameters if there are some. Default: `false`.
-
-- `files`: (string|string[]) Files and/or directories to be loaded for execution. Default: `[]`.
-
-- `ext`: (string|string[]) File extensions to be loaded if `files` contains path to directories. Default: `['.js', '.mjs', '.cjs']`.
-
-- `options`: See `mocha` options [there](https://mochajs.org/api/mocha).
-
-- `parameters`: (object|object[]) Learn more about `parameters` option [here](#parameters).
+Strings given to `files` and `ext` can be comma separated (e.g. `".js,.mjs"`).
 
 Example:
-```js
+
+```jsonc
 {
   /* kaukau options */
   "enableLogs": true,
   "exitOnFail": false,
-  "files": [], // Test files/directories to execute. (e.g.: [ "tests/test01.js" ])
+  "files": [], // e.g.: ["tests/test01.js", "tests/more/"]
+  "ext": [".js", ".mjs", ".cjs"],
+
+  /* mocha options */
   "options": {
-    /* mocha options */
+    "timeout": 10000
   },
 
   /* sets of parameters */
   "parameters": [
-    {      
-      "kaukauOptions":{
-        /* Overwrite kaukau options */
-      },
-      "mochaOptions":{
-        /* Overwrite mocha options */
-      }
+    {
+      /* overwrite kaukau options for this set */
+      "kaukauOptions": {},
+      /* overwrite mocha options for this set */
+      "mochaOptions": {},
+
       /* custom parameters */
-      // ...
+      "host": "https://example.com"
     }
-  ]  
+  ]
 }
 ```
 
-## Helpers
+> The `directory` option and `--directory` flag are **deprecated**: use `files` and `--file`.
 
-The following helpers come with `kaukau`.
+### `defineConfig` and `defineParameters`
 
-### Parameters
+Helpers (exported from `kaukau/config`) to write typed configuration and parameters files:
 
-Usefull if you need to run the same tests with different parameters and options.
+```ts
+// kaukau-config.ts
+import { defineConfig } from 'kaukau/config';
 
-If you define sets of `parameters` in your [configuration](#configuration), the test scripts will be executed for each set.
-You can access parameters for the current set running as:
-```js
-describe('test 01', function() {
-
-  const { params } = this.ctx.kaukau;
-
-  /**
-   * In configuration:
-   * parameters: [
-   *  {
-   *    host: "test.com",
-   *    credentials: {
-   *      email: "test@test.com"
-   *    }
-   *  }
-   * ]
-   */
-  let host = params('host'); // "test.com"
-  let email = params('credentials.email'); // "test@test.com"
+export default defineConfig({
+  files: 'tests/',
+  parameters: [{ host: 'https://example.com' }],
 });
 ```
 
-Parameters can overwrite the main configuration by using the properties `kaukauOptions` and `mochaOptions`.
+```ts
+// parameters.ts
+import { defineParameters } from 'kaukau/config';
 
-`kaukauOptions` can overwrite `files` and `ext`.
+export default defineParameters([{ host: 'https://example.com' }]);
+```
 
-`mochaOptions` can overwrite all [mocha](https://mochajs.org/api/mocha) options.
+## Helpers (`this.ctx.kaukau`)
+
+In your test files, kaukau adds helpers to the Mocha context: `this.ctx.kaukau` contains `params` (also `parameters`), `logger` (also `log`) and `tester`.
+
+> Use a regular `function` (not an arrow function) for `describe` to access `this`.
+
+### Parameters
+
+Useful to run the same tests with different parameters and options.
+
+If you define several sets of `parameters` in your [configuration](#configuration), the test files are executed once for each set. `params(path)` reads a value from the set currently running (dot notation or array path); `params()` returns the whole set.
+
+```js
+describe('test 01', function () {
+  const { params } = this.ctx.kaukau;
+
+  /**
+   * In the configuration:
+   * parameters: [
+   *   { host: "test.com", credentials: { email: "test@test.com" } }
+   * ]
+   */
+  const host = params('host'); // "test.com"
+  const email = params('credentials.email'); // "test@test.com"
+});
+```
+
+A set of parameters can overwrite the main configuration with `kaukauOptions` and `mochaOptions`:
+
+- `kaukauOptions` can overwrite `files` and `ext`.
+- `mochaOptions` can overwrite any [Mocha option](https://mochajs.org/api/mocha).
+
+Parameters can also be loaded from files with `--parameters <file|folder>` (one set per file, `.json`, `.js`, `.mjs` or `.cjs`).
 
 ### Logger
 
-Logging utility.
-
 ```js
-describe('test 02', function() {
-
+describe('test 02', function () {
   const { logger } = this.ctx.kaukau;
 
   logger.trace('trace level');
@@ -159,73 +256,115 @@ describe('test 02', function() {
   logger.info('info level');
   logger.warn('warn level');
   logger.error('error level');
+  logger.success('success level');
 });
 ```
 
+The log level is set with `logLevel` in the configuration. Kaukau's internal logs use [`@novice1/logger`](https://www.npmjs.com/package/@novice1/logger); with `--debug` (or `DEBUG=kaukau:*`) you also get the `kaukau:*` debug namespaces.
 
 ### Tester
 
-Example:
+A small wrapper around `fetch` with default request options.
+
 ```js
 // chai@4
 const { expect } = require('chai');
 
-describe('test 03', function() {
-
+describe('test 03', function () {
   const { params, tester } = this.ctx.kaukau;
 
   // set default options (RequestInit)
-  tester.setRequestDefaults({});
-  
-  // overwrite default options
-  tester.updateRequestDefaults({});
-  
-  /* request */
-  
+  tester.setRequestDefaults({ headers: { accept: 'application/json' } });
+
+  // merge into the default options
+  tester.updateRequestDefaults({ redirect: 'follow' });
+
+  // read the default options
+  tester.getRequestDefaults();
+
   it('should be ok', async () => {
-    /**
-     * @type {Response}
-     */
-    const res = await tester.request(params('host'), {
-      method: 'GET'
-    });
+    /** @type {Response} */
+    const res = await tester.request(params('host'), { method: 'GET' });
     expect(res.status).to.equal(200);
   });
 });
 ```
 
-## 📝 Notes
+`tester.sessionId` is a free field to keep a session identifier between tests.
 
-* To run TypeScript test files (e.g. `test/example.test.ts`), make sure to install the required dependencies:
+## TypeScript
 
-```sh
+### Typing `this.ctx.kaukau`
+
+The `this.ctx.kaukau` types are loaded when `kaukau` is imported somewhere in the program. For test files that never import it, either:
+
+- add a declaration file (e.g. `kaukau.d.ts`, covered by your `include`) containing:
+
+  ```ts
+  import 'kaukau';
+  ```
+
+- or add `kaukau` to `types` in your `tsconfig.json` (when `types` is set, list the other type packages too):
+
+  ```json
+  {
+    "compilerOptions": {
+      "types": ["node", "mocha", "kaukau"]
+    }
+  }
+  ```
+
+This requires `moduleResolution` set to `node16`, `nodenext` or `bundler` in your `tsconfig.json`.
+
+### Running TypeScript tests
+
+Install a TypeScript loader (e.g. `ts-node`) and the type definitions:
+
+```bash
 npm install --save-dev ts-node @types/mocha
 ```
 
-* Then, you can run your test file using:
+Then require it:
 
-```sh
-kaukau --require ts-node/register --file test/example.test.ts
+```bash
+kaukau --require ts-node/register --file tests/ --ext .test.ts
 ```
 
-> 💡 This enables TypeScript support via `ts-node`, and provides the necessary type definitions for Mocha-style tests.
+### Exported types
 
-### TypeScript
-
-To get types for `this.ctx.kaukau` in your test files, add `kaukau` to `types` in your `tsconfig.json`:
-
-```json
-{
-  "compilerOptions": {
-    "types": ["node", "mocha", "kaukau"]
-  }
-}
+```ts
+import { Kaukau, defineConfig, defineParameters } from 'kaukau';
+import type {
+  KaukauOptions,
+  KaukauConfig,
+  IParameters,
+  BaseOptions,
+  LogLevel,
+  Runner,
+  KaukauContext,
+} from 'kaukau';
 ```
 
-Or add a file such as `kaukau.d.ts` that contains `import 'kaukau';`.
+## Migrating to v6
 
-## Reference
+- Kaukau is written in TypeScript and only uses **named exports**:
+
+  ```diff
+  - const Kaukau = require('kaukau');
+  + const { Kaukau } = require('kaukau');
+  ```
+
+  ```diff
+  - import Kaukau from 'kaukau';
+  + import { Kaukau } from 'kaukau';
+  ```
+
+- `kaukau/config` still exports `defineConfig` and `defineParameters`.
+- Node.js `^20.19.0 || >=22.12.0` is required.
+- `mocha` (and optionally `@types/mocha`, `@types/node`) must be installed by you (peer dependencies).
+
+## References
 
 - [mocha](https://mochajs.org/)
 - [chai](https://www.chaijs.com/api/)
-- [axios](https://www.npmjs.com/package/axios)
+- [@novice1/logger](https://www.npmjs.com/package/@novice1/logger)
