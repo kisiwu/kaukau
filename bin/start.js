@@ -82,10 +82,19 @@ function startFactory(program) {
       LoggerDebug.enable('kaukau:*');
     }
 
+    // --isolate
+    if (opts.isolate !== undefined) {
+      options.isolate = { require: [], execArgv: [] };
+    }
+
     // --require
     if (opts.require) {
       opts.require.forEach(function (mod) {
         debug.trace('--require', mod);
+        if (options.isolate) {
+          debug.trace('Requiring module in isolate mode:', mod);
+          options.isolate.require.push(mod);
+        }
         require(mod);
       });
     }

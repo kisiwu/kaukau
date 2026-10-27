@@ -56,6 +56,8 @@ program
     'files to watch to run the tests'
   )
   .option('--ignore', 'do not watch files (overrides --watch)')
+  .option('--isolate', 'run tests in isolation')
+  .option('--no-isolate', "do not run tests in isolation")
   .action(startFactory(program));
 
 program.parse(process.argv);

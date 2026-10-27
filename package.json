@@ -1,7 +1,7 @@
 {
   "name": "kaukau",
   "private": false,
-  "version": "5.1.0-alpha.2",
+  "version": "6.0.0-alpha.0",
   "description": "JS test tools, Mocha wrapper",
   "main": "lib/index.js",
   "types": "./lib/index.d.ts",
@@ -32,6 +32,7 @@
     "check": "tsc --noEmit",
     "testcmd": "node ./bin/kaukau",
     "cmd": "node ./bin/kaukau --file test/tests --parameters test/config/parameters --config test/config/main.json",
+    "cmd:isolate": "node ./bin/kaukau --file test/tests --parameters test/config/parameters --config test/config/main.json --isolate",
     "cmd:esm": "node ./bin/kaukau --parameters test/config/parameters-esm --config test/config/main-esm.json",
     "cmd:esm1": "node ./bin/kaukau --config test/config/main-esm.mjs",
     "init": "node ./bin/kaukau init --file test/tests/o2 --config test/config/main.json",
