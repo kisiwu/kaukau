@@ -368,3 +368,29 @@ import type {
 - [mocha](https://mochajs.org/)
 - [chai](https://www.chaijs.com/api/)
 - [@novice1/logger](https://www.npmjs.com/package/@novice1/logger)
+
+## Known limitation: ES modules in `.js` test files
+
+When you define **several sets of `parameters`**, kaukau loads your test files again for each set. This only works if Node re-executes the files.
+
+- **CommonJS files** (`.js`, `.cjs`, `require(...)`) are re-executed for every set.
+- **`.mjs` files** are re-executed for every set.
+- **`.js` files that use ESM syntax** (`import`/`export`, with or without `"type": "module"` in `package.json`) are executed **only for the first set**. Node loads them through `require(esm)` and caches them, so the next sets silently skip them and their tests do not run.
+
+Do not mix ESM syntax into `.js` test files:
+
+```diff
+- // tests/example.js
+- import { expect } from 'chai';
++ // tests/example.js (CommonJS)
++ const { expect } = require('chai');
+```
+
+or rename the file to `.mjs` (and add `.mjs` to `ext` if you load directories):
+
+```diff
+- tests/example.js   (with `import`)
++ tests/example.mjs
+```
+
+With a single set of parameters this limitation does not apply.
