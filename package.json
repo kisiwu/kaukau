@@ -46,7 +46,7 @@
   "author": "demingongo (https://github.com/demingongo)",
   "license": "MIT",
   "dependencies": {
-    "@novice1/logger": "^2.0.0-alpha.1",
+    "@novice1/logger": "^2.0.0",
     "async-waterfall": "^0.1.5",
     "chokidar": "^6.0.0",
     "commander": "^15.0.0",
