@@ -39,7 +39,8 @@
     "test": "node ./test/test.js",
     "test:esm": "node ./test/test-esm.js",
     "test:esm1": "node ./test/test-esm.mjs",
-    "watch": "node ./bin/kaukau --file test/tests --parameters test/config/parameters --config test/config/main.json --watch test/config/main.json --logs"
+    "watch": "node ./bin/kaukau --file test/tests --parameters test/config/parameters --config test/config/main.json --watch test/config/main.json --logs",
+    "watch:isolate": "node ./bin/kaukau --file test/tests --parameters test/config/parameters --config test/config/main.json --watch test/config/main.json --logs --isolate"
   },
   "bin": {
     "kaukau": "bin/kaukau.js"
