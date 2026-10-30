@@ -1,7 +1,7 @@
 import type { MochaOptions } from 'mocha';
 import { EventEmitter } from 'node:events';
-import * as fs from 'node:fs';
-import * as path from 'node:path';
+import fs from 'node:fs';
+import path from 'node:path';
 import { KaukauLogger } from './ctx/logger';
 import type { KaukauLoggerOptions } from './ctx/logger';
 import { Tester } from './ctx/tester';
