@@ -1,4 +1,4 @@
-import type { EventEmitter } from 'events';
+import type { EventEmitter } from 'node:events';
 import Mocha from 'mocha';
 import * as statsCollector from 'mocha/lib/stats-collector';
 import type { KaukauLogger } from './ctx/logger';

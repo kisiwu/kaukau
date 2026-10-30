@@ -171,9 +171,9 @@ export class KaukauLogger {
   protected _writeLine({ message, prefixText, level }: { message: string; prefixText: string, level: string }): void {
     const msg = `${this.indent()}kaukau ${prefixText} : ${message}\n`;
     if (level === 'error') {
-      process.stderr.write(msg);
+      Logger.writeStderr(msg);
     } else {
-      process.stdout.write(msg);
+      Logger.writeStdout(msg);
     }
   }
 

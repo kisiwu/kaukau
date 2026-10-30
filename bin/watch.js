@@ -30,9 +30,9 @@ const customLogger = Logger.createLogger({
             fgColorText(Logger.formatMessage(args, true), Logger.colors.BRIGHT) +
             '\n';
         if (level === 'error') {
-            process.stderr.write(msg);
+            Logger.writeStderr(msg);
         } else {
-            process.stdout.write(msg);
+            Logger.writeStdout(msg);
         }
     }
 });

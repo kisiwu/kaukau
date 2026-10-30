@@ -1,4 +1,5 @@
-import { EventEmitter } from 'events';
+import { EventEmitter } from 'node:events';
+import { Logger } from '@novice1/logger';
 import { KaukauLogger } from '../ctx/logger';
 import { Tester } from '../ctx/tester';
 import type { KaukauEmitter } from '../events';
@@ -57,7 +58,7 @@ async function run(message: RunMessage): Promise<void> {
   MOCHA_RUNNER_EVENTS.forEach((name) => {
     emitter.on(name, (...args: unknown[]) => {
       send({ type: 'event', name, args: args.slice(0, -1).map((arg) => serializeValue(arg)) }).catch((err) => {
-        process.stderr.write(`kaukau: could not send the event "${name}": ${err}\n`);
+        Logger.writeStderr(`kaukau: could not send the event "${name}": ${err}\n`);
       });
     });
   });
