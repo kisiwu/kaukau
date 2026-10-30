@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
-const pckg = require('../package'),
-  { Command } = require('commander'),
-  startFactory = require('./start'),
-  setupFactory = require('./setup');
+import pckg from '../../package.json' with { type: "json" };
+import { Command } from 'commander';
+import setupFactory from './setup.js';
+import startFactory from './start.js';
 
 const program = new Command();
 

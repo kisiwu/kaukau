@@ -1,33 +1,8 @@
 {
+  "extends": "./tsconfig.base.json",
   "include": ["src"],
-  "exclude": ["node_modules"],
   "compilerOptions": {
     "outDir": "./lib",
-    "rootDir": "./src",
-    
-    /* Target & Environment */
-    "target": "ES2022",
-    "lib": ["ES2022"], 
-
-    "typeRoots": ["node_modules/@types"],
-    "types": ["node", "web"],
-    
-    /* Module Resolution */
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
-    "verbatimModuleSyntax": true,
-    
-    /* Output & Declarations */
-    "declaration": true,
-    "sourceMap": true,
-    
-    /* Strictness & Safety */
-    "strict": true,
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
+    "rootDir": "./src"
   }
 }

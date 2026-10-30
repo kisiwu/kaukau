@@ -1,5 +1,6 @@
 import { fork } from 'node:child_process';
 import path from 'node:path';
+import process from 'node:process';
 import type { KaukauLogger } from '../ctx/logger.js';
 import type { KaukauEmitter } from '../events.js';
 import type { ResolvedIsolateOptions } from '../options.js';

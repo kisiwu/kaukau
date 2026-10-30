@@ -1,26 +1,30 @@
 {
   "name": "kaukau",
   "private": false,
-  "version": "6.0.0-alpha.0",
+  "version": "6.0.0-alpha.1",
   "description": "JS test tools, Mocha wrapper",
   "type": "module",
-  "main": "lib/index.js",
+  "main": "./lib/index.cjs",
+  "module": "./lib/index.js",
   "types": "./lib/index.d.ts",
   "exports": {
     ".": {
       "types": "./lib/index.d.ts",
       "import": "./lib/index.js",
-      "require": "./lib/index.cjs"
+      "require": "./lib/index.cjs",
+      "default": "./lib/index.js"
     },
     "./config": {
       "types": "./lib/config.d.ts",
       "import": "./lib/config.js",
-      "require": "./lib/config.cjs"
+      "require": "./lib/config.cjs",
+      "default": "./lib/config.js"
     },
     "./kaukau": {
       "types": "./lib/kaukau.d.ts",
       "import": "./lib/kaukau.js",
-      "require": "./lib/kaukau.cjs"
+      "require": "./lib/kaukau.cjs",
+      "default": "./lib/kaukau.js"
     },
     "./package.json": "./package.json"
   },
@@ -34,21 +38,21 @@
   "scripts": {
     "build": "tsdown src/**/*.ts --format cjs,esm --out-dir lib --clean --dts --sourcemap --unbundle --no-fixed-extension",
     "check": "tsc --noEmit",
-    "testcmd": "node ./bin/kaukau",
-    "cmd": "node ./bin/kaukau --file test/tests --parameters test/config/parameters --config test/config/main.json",
-    "cmd:isolate": "node ./bin/kaukau --file test/tests --parameters test/config/parameters --config test/config/main.json --isolate",
-    "cmd:esm": "node ./bin/kaukau --parameters test/config/parameters-esm --config test/config/main-esm.json",
-    "cmd:esm1": "node ./bin/kaukau --config test/config/main-esm.mjs",
-    "init": "node ./bin/kaukau init --file test/tests/o2 --config test/config/main.json",
+    "testcmd": "node ./lib/bin/kaukau",
+    "cmd": "node ./lib/bin/kaukau --file test/tests --parameters test/config/parameters --config test/config/main.json",
+    "cmd:isolate": "node ./lib/bin/kaukau --file test/tests --parameters test/config/parameters --config test/config/main.json --isolate",
+    "cmd:esm": "node ./lib/bin/kaukau --parameters test/config/parameters-esm --config test/config/main-esm.json",
+    "cmd:esm1": "node ./lib/bin/kaukau --config test/config/main-esm.mjs",
+    "init": "node ./lib/bin/kaukau init --file test/tests/o2 --config test/config/main.json",
     "test": "node ./test/test.js",
     "test:esm": "node ./test/test-esm.js",
     "test:esm1": "node ./test/test-esm.mjs",
-    "watch": "node ./bin/kaukau --file test/tests --parameters test/config/parameters --config test/config/main.json --watch test/config/main.json --logs",
-    "watch:esm": "node ./bin/kaukau --file test/tests --parameters test/config/parameters-esm --config test/config/main-esm.json --watch test/config/main-esm.json --logs",
-    "watch:isolate": "node ./bin/kaukau --file test/tests --parameters test/config/parameters --config test/config/main.json --watch test/config/main.json --logs --isolate"
+    "watch": "node ./lib/bin/kaukau --file test/tests --parameters test/config/parameters --config test/config/main.json --watch test/config/main.json --logs",
+    "watch:esm": "node ./lib/bin/kaukau --file test/tests --parameters test/config/parameters-esm --config test/config/main-esm.json --watch test/config/main-esm.json --logs",
+    "watch:isolate": "node ./lib/bin/kaukau --file test/tests --parameters test/config/parameters --config test/config/main.json --watch test/config/main.json --logs --isolate"
   },
   "bin": {
-    "kaukau": "bin/kaukau.js"
+    "kaukau": "./lib/bin/kaukau.js"
   },
   "keywords": [
     "kaukau",

@@ -7,7 +7,6 @@ export default {
 		"bail": false,
 		"fullTrace": true,
 		"grep": "",
-		"ignoreLeaks": false,
 		"reporter": "spec",
 		"retries": 0,
 		"slow": 150,

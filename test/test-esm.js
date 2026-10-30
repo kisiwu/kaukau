@@ -1,4 +1,4 @@
-var {Kaukau} = require('../lib');
+var {Kaukau} = require('../lib/index.cjs');
 
 var kaukau = new Kaukau(
   {
