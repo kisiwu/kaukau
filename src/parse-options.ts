@@ -1,5 +1,5 @@
 import type { MochaOptions } from 'mocha';
-import type { IsolateOptions, LogLevel, ResolvedIsolateOptions } from './options';
+import type { IsolateOptions, LogLevel, ResolvedIsolateOptions } from './options.js';
 
 interface KaukauOptionDefinition {
   readonly name: string;

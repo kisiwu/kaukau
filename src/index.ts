@@ -1,7 +1,7 @@
-export { Kaukau } from './kaukau';
-export { defineConfig, defineParameters } from './config';
-export type { KaukauConfig } from './config';
-export type { Runner } from './runner';
+export { Kaukau } from './kaukau.js';
+export { defineConfig, defineParameters } from './config.js';
+export type { KaukauConfig } from './config.js';
+export type { Runner } from './runner.js';
 export type {
   KaukauOptions,
   BaseOptions,
@@ -9,7 +9,7 @@ export type {
   IsolateOptions,
   LogLevel,
   ResolvedIsolateOptions,
-} from './options';
+} from './options.js';
 export type {
   AddFileEvent,
   KaukauContext,
@@ -22,4 +22,4 @@ export type {
   SettingOptionsEndEvent,
   SettingOptionsEvent,
   SettingTesterEvent,
-} from './events';
+} from './events.js';

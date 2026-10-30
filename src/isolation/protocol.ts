@@ -1,6 +1,6 @@
 import type { MochaOptions } from 'mocha';
-import type { KaukauLoggerOptions } from '../ctx/logger';
-import type { SerializedError } from './serialize';
+import type { KaukauLoggerOptions } from '../ctx/logger.js';
+import type { SerializedError } from './serialize.js';
 
 /**
  * Messages exchanged between the main process and the child process running a set of parameters.

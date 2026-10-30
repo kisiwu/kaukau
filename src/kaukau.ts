@@ -2,11 +2,11 @@ import type { MochaOptions } from 'mocha';
 import { EventEmitter } from 'node:events';
 import fs from 'node:fs';
 import path from 'node:path';
-import { KaukauLogger } from './ctx/logger';
-import type { KaukauLoggerOptions } from './ctx/logger';
-import { Tester } from './ctx/tester';
-import { createStatsCollector, executeInProcess } from './execute';
-import { runInChild } from './isolation/run-in-child';
+import { KaukauLogger } from './ctx/logger.js';
+import type { KaukauLoggerOptions } from './ctx/logger.js';
+import { Tester } from './ctx/tester.js';
+import { createStatsCollector, executeInProcess } from './execute.js';
+import { runInChild } from './isolation/run-in-child.js';
 import type {
   KaukauContext,
   KaukauEmitter,
@@ -18,13 +18,13 @@ import type {
   SettingTesterEvent,
   SettingEndEvent,
   AddFileEvent,
-} from './events';
-import type { KaukauOptions, LogLevel, ResolvedIsolateOptions } from './options';
-import { Parameters } from './parameters';
-import { parseKaukauOptions, parseMochaOptions, parseOptions, resolveIsolate } from './parse-options';
-import type { ParsedKaukauOptions } from './parse-options';
-import type { Runner } from './runner';
-import type { PreparedSet } from './prepared-set';
+} from './events.js';
+import type { KaukauOptions, LogLevel, ResolvedIsolateOptions } from './options.js';
+import { Parameters } from './parameters.js';
+import { parseKaukauOptions, parseMochaOptions, parseOptions, resolveIsolate } from './parse-options.js';
+import type { ParsedKaukauOptions } from './parse-options.js';
+import type { Runner } from './runner.js';
+import type { PreparedSet } from './prepared-set.js';
 
 declare global {
   namespace Mocha {

@@ -1,8 +1,8 @@
 import type { EventEmitter } from 'node:events';
 import type Mocha from 'mocha';
-import type { KaukauLogger } from './ctx/logger';
-import type { Tester } from './ctx/tester';
-import type { Parameters } from './parameters';
+import type { KaukauLogger } from './ctx/logger.js';
+import type { Tester } from './ctx/tester.js';
+import type { Parameters } from './parameters.js';
 
 /**
  * Parameters getter, e.g. `params('host')`.

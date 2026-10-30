@@ -1,19 +1,14 @@
-import type { EventEmitter } from 'node:events';
 import Mocha from 'mocha';
-import statsCollector from 'mocha/lib/stats-collector';
-import type { KaukauLogger } from './ctx/logger';
-import type { KaukauEmitter } from './events';
-import type { PreparedSet } from './prepared-set';
+import type { KaukauLogger } from './ctx/logger.js';
+import type { KaukauEmitter } from './events.js';
+import type { PreparedSet } from './prepared-set.js';
 
 // @types/mocha declares `loadFilesAsync(): Promise<void>` without the `esmDecorator` option
 type MochaWithEsmDecorator = Omit<Mocha, 'loadFilesAsync'> & {
   loadFilesAsync(options?: { esmDecorator?: (file: string) => string }): Promise<void>;
 };
 
-// mocha >= 11 exposes `createStatsCollector` as a named export, but @types/mocha still declares a single `export =`
-export const { createStatsCollector } = statsCollector as unknown as {
-  createStatsCollector: (runner: EventEmitter) => void;
-};
+export { createStatsCollector } from 'mocha/lib/stats-collector.js';
 
 const {
   EVENT_RUN_BEGIN,

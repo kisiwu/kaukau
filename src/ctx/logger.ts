@@ -7,8 +7,8 @@ import type {
   RunnerEventPayload,
   SettingMochaEndEvent,
   SettingOptionsEndEvent,
-} from '../events';
-import type { LogLevel } from '../options';
+} from '../events.js';
+import type { LogLevel } from '../options.js';
 
 const debugEvents = Logger.debugger('kaukau:events');
 

@@ -1,7 +1,7 @@
 import type { MochaOptions } from 'mocha';
-import type { IParameters, KaukauOptions } from './options';
-import { Parameters } from './parameters';
-import { parseKaukauOptions, parseMochaOptions, parseOptions } from './parse-options';
+import type { IParameters, KaukauOptions } from './options.js';
+import { Parameters } from './parameters.js';
+import { parseKaukauOptions, parseMochaOptions, parseOptions } from './parse-options.js';
 
 export interface KaukauConfig extends KaukauOptions {
     enableLogs: boolean;

@@ -1,8 +1,8 @@
 import type { MochaOptions } from 'mocha';
-import type { Tester } from './ctx/tester';
-import type { ParametersGetter } from './events';
-import type { ResolvedIsolateOptions } from './options';
-import type { ParsedKaukauOptions } from './parse-options';
+import type { Tester } from './ctx/tester.js';
+import type { ParametersGetter } from './events.js';
+import type { ResolvedIsolateOptions } from './options.js';
+import type { ParsedKaukauOptions } from './parse-options.js';
 
 /**
  * Everything known about a set of parameters once it is set up, before any test file is loaded.

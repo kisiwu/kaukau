@@ -1,11 +1,11 @@
 import { fork } from 'node:child_process';
 import path from 'node:path';
-import type { KaukauLogger } from '../ctx/logger';
-import type { KaukauEmitter } from '../events';
-import type { ResolvedIsolateOptions } from '../options';
-import type { PreparedSet } from '../prepared-set';
-import type { ChildToParentMessage, RunMessage } from './protocol';
-import { assertCloneable, deserializeValue, type SerializedError } from './serialize';
+import type { KaukauLogger } from '../ctx/logger.js';
+import type { KaukauEmitter } from '../events.js';
+import type { ResolvedIsolateOptions } from '../options.js';
+import type { PreparedSet } from '../prepared-set.js';
+import type { ChildToParentMessage, RunMessage } from './protocol.js';
+import { assertCloneable, deserializeValue, type SerializedError } from './serialize.js';
 
 export interface RunInChildContext {
   emitter: KaukauEmitter;
@@ -16,6 +16,12 @@ export interface RunInChildContext {
 
 // time given to a child that sent its result to exit by itself, before it is killed
 const EXIT_GRACE_MS = 5000;
+
+let cachedChildPath: string | undefined;
+
+function getChildPath(): string {
+  return (cachedChildPath ??= path.join(import.meta.dirname, 'child.js'));
+}
 
 function buildRunMessage(prepared: PreparedSet, context: RunInChildContext): RunMessage {
   const message: RunMessage = {
@@ -71,7 +77,7 @@ export async function runInChild(
 
   try {
     return await new Promise<number>((resolve) => {
-      const child = fork(path.join(__dirname, 'child.js'), [], {
+      const child = fork(getChildPath(), [], {
         serialization: 'advanced',
         stdio: ['inherit', 'inherit', 'inherit', 'ipc'],
         execArgv,

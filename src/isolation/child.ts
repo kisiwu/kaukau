@@ -1,13 +1,14 @@
 import { EventEmitter } from 'node:events';
+import process from 'node:process';
 import { Logger } from '@novice1/logger';
-import { KaukauLogger } from '../ctx/logger';
-import { Tester } from '../ctx/tester';
-import type { KaukauEmitter } from '../events';
-import { createStatsCollector, executeInProcess, MOCHA_RUNNER_EVENTS } from '../execute';
-import { Parameters } from '../parameters';
-import type { PreparedSet } from '../prepared-set';
-import type { ChildToParentMessage, ParentToChildMessage, RunMessage } from './protocol';
-import { serializeError, serializeValue } from './serialize';
+import { KaukauLogger } from '../ctx/logger.js';
+import { Tester } from '../ctx/tester.js';
+import type { KaukauEmitter } from '../events.js';
+import { createStatsCollector, executeInProcess, MOCHA_RUNNER_EVENTS } from '../execute.js';
+import { Parameters } from '../parameters.js';
+import type { PreparedSet } from '../prepared-set.js';
+import type { ChildToParentMessage, ParentToChildMessage, RunMessage } from './protocol.js';
+import { serializeError, serializeValue } from './serialize.js';
 
 /**
  * Entry point of the child process: runs one set of parameters and reports to the main process.
