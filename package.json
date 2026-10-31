@@ -62,7 +62,7 @@
   "author": "demingongo (https://github.com/demingongo)",
   "license": "MIT",
   "dependencies": {
-    "@novice1/logger": "^2.0.1-alpha.2",
+    "@novice1/logger": "^2.0.1-alpha.3",
     "chokidar": "^6.0.0",
     "commander": "^15.0.0",
     "deep-property-access": "^1.0.1",
