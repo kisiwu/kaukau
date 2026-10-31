@@ -25,7 +25,7 @@ npm install kaukau mocha --save-dev
 For TypeScript users, also install the type definitions:
 
 ```bash
-npm install @types/mocha @types/node --save-dev
+npm install @types/mocha --save-dev
 ```
 
 ## Quick start
@@ -360,7 +360,7 @@ The `this.ctx.kaukau` types are loaded when `kaukau` is imported somewhere in th
   ```json
   {
     "compilerOptions": {
-      "types": ["node", "mocha", "kaukau"]
+      "types": ["mocha", "kaukau"]
     }
   }
   ```
@@ -413,7 +413,7 @@ import type {
 
 - `kaukau/config` still exports `defineConfig` and `defineParameters`.
 - Node.js `^20.19.0 || >=22.12.0` is required.
-- `mocha` (and optionally `@types/mocha`, `@types/node`) must be installed by you (peer dependencies).
+- `mocha` (and optionally `@types/mocha`) must be installed by you (peer dependencies).
 
 ## References
 
