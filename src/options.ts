@@ -4,7 +4,7 @@ export type LogLevel = 'error' | 'warn' | 'info' | 'verbose' | 'debug' | 'trace'
 
 export interface IsolateOptions {
     /**
-     * Modules preloaded in the child process (as `--require`), e.g. `ts-node/register`. Comma (`,`) separated or array.
+     * Modules preloaded in the child process (as `--require`), e.g. `tsx`. Comma (`,`) separated or array.
      */
     require?: string | string[];
     /**

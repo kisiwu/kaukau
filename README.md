@@ -88,7 +88,7 @@ kaukau setup --config kaukau-config.js --file tests/
 | `--ext <extension>` | File extensions to be loaded (see [`ext`](#configuration)) |
 | `-c, --config <name>` | Configuration file (`.json`, `.js`, `.mjs`, `.cjs`) |
 | `--parameters <name>` | File or folder containing the parameters (`.json`, `.js`, `.mjs`, `.cjs`) |
-| `-r, --require <names>` | Comma separated modules to require before running (e.g. `ts-node/register`) |
+| `-r, --require <names>` | Comma separated modules to require before running (e.g. `tsx`) |
 | `--logs` / `--no-logs` | Enable/disable kaukau logs |
 | `--exit-on-fail` / `--no-exit-on-fail` | Stop after the first set of parameters that has a failing test |
 | `--watch <globs...>` | Re-run the tests when these files change |
@@ -235,7 +235,7 @@ With `isolate`, **each set runs in its own child process**, so nothing is shared
 
   | Property | Type | Description |
   |---|---|---|
-  | `require` | `string \| string[]` | Modules to preload in the child process (`--require`), e.g. `ts-node/register`. Comma separated or array |
+  | `require` | `string \| string[]` | Modules to preload in the child process (`--require`), e.g. `tsx`. Comma separated or array |
   | `execArgv` | `string[]` | Extra Node.js arguments, e.g. `["--max-old-space-size=4096", "--import", "./setup.mjs"]` |
 
 A set can enable or disable it for itself with `kaukauOptions`:
@@ -369,16 +369,16 @@ This requires `moduleResolution` set to `node16`, `nodenext` or `bundler` in you
 
 ### Running TypeScript tests
 
-Install a TypeScript loader (e.g. `ts-node`) and the type definitions:
+Install a TypeScript loader (e.g. `tsx`) and the type definitions:
 
 ```bash
-npm install --save-dev ts-node @types/mocha
+npm install --save-dev tsx @types/mocha
 ```
 
 Then require it:
 
 ```bash
-kaukau --require ts-node/register --file tests/ --ext .test.ts
+kaukau --require tsx --file tests/ --ext .test.ts
 ```
 
 ### Exported types
