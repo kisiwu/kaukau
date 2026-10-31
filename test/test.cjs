@@ -1,4 +1,4 @@
-var {Kaukau} = require('../lib/index.cjs');
+var { Kaukau } = require('../lib/index.cjs');
 
 var kaukau = new Kaukau(
   {
@@ -11,7 +11,7 @@ var kaukau = new Kaukau(
     "enableLogs": true,
     "logLevel": "debug",
     "exitOnFail": false,
-    "ext": ".spec.js",
+    "ext": [".spec.js", ".spec.cjs"],
     "options": {
       "color": true,
       "timeout": 10000,
@@ -49,9 +49,9 @@ var kaukau = new Kaukau(
           "file": "test/tests/",
           "files": "test/tests/sub2"
         },
-        "mochaOptions":{
+        "mochaOptions": {
           //reporter: require('path').resolve('test/reporter')
-          
+
           /*
           "reporter": "mochawesome",
           "reporterOptions": {
@@ -67,12 +67,12 @@ var kaukau = new Kaukau(
 );
 
 kaukau.run()
-.on('done', function(){
-  // done
-  console.log('done')
-})
-.on('fail', function(test){
-  console.error(test.title);
-  console.error(test.err.message);
-  console.error(test.file);
-});
+  .on('done', function () {
+    // done
+    console.log('done')
+  })
+  .on('fail', function (test) {
+    console.error(test.title);
+    console.error(test.err.message);
+    console.error(test.file);
+  });

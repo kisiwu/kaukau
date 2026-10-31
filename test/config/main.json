@@ -2,7 +2,7 @@
 	"enableLogs": true,
 	"exitOnFail": false,
 	"directory": "test/tests",
-	"ext": ".js",
+	"ext": [".cjs", ".js", ".spec.mjs"],
 	"options": {
 		"bail": false,
 		"fullTrace": true,
