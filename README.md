@@ -16,7 +16,7 @@ Node.js test tools: a [Mocha](https://mochajs.org/) wrapper with sets of paramet
 
 ## Install
 
-`mocha` is a peer dependency, install it alongside kaukau (Node.js `^20.19.0 || >=22.12.0`):
+`mocha` is a peer dependency, install it alongside kaukau (Node.js `>=22.12.0`):
 
 ```bash
 npm install kaukau mocha --save-dev
@@ -412,7 +412,7 @@ import type {
   ```
 
 - `kaukau/config` still exports `defineConfig` and `defineParameters`.
-- Node.js `^20.19.0 || >=22.12.0` is required.
+- Node.js `>=22.12.0` is required.
 - `mocha` (and optionally `@types/mocha`) must be installed by you (peer dependencies).
 
 ## References
