@@ -1,7 +1,7 @@
 {
   "name": "kaukau",
   "private": false,
-  "version": "6.0.0-alpha.3",
+  "version": "6.0.0-alpha.4",
   "description": "JS test tools, Mocha wrapper",
   "type": "module",
   "main": "./lib/index.cjs",
@@ -62,9 +62,9 @@
   "author": "demingongo (https://github.com/demingongo)",
   "license": "MIT",
   "dependencies": {
-    "@novice1/logger": "^2.0.1-alpha.3",
+    "@novice1/logger": "^2.0.1-alpha.4",
     "chokidar": "^6.0.0",
-    "commander": "^15.0.0",
+    "commander": "^15.1.0",
     "deep-property-access": "^1.0.1",
     "mkdirp": "^3.0.1"
   },

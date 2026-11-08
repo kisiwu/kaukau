@@ -36,12 +36,10 @@ const customLogger = Logger.createLogger({
         } else {
             Logger.writeStdout(msg);
         }
-    }
+    },
+    // no need for @novice1/logger to format the message as we do it all in the "write" function
+    alwaysFormat: false
 });
-// no need for @novice1/logger to 
-// format the message as we do it all in the
-// "write" function
-customLogger.alwaysFormat = false
 
 /**
  * Watches the specified file globs and runs the given command with arguments when changes are detected.
