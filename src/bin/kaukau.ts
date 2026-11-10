@@ -9,7 +9,6 @@ const program = new Command();
 
 program
   .version(pckg.version)
-  .option('--directory <name>', 'folder containing the test files (DEPRECATED)')
   .option('-f, --file <name>', 'file/folder to be loaded for execution')
   .option('--debug', 'debug mode');
 

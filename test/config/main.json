@@ -1,7 +1,7 @@
 {
 	"enableLogs": true,
 	"exitOnFail": false,
-	"directory": "test/tests",
+	"files": "test/tests",
 	"ext": [".cjs", ".js", ".spec.mjs"],
 	"options": {
 		"bail": false,

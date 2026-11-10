@@ -94,7 +94,6 @@ kaukau setup --config kaukau-config.js --file tests/
 | `--watch <globs...>` | Re-run the tests when these files change |
 | `--ignore` | Do not watch files (overrides `--watch`) |
 | `--debug` | Debug mode |
-| `--directory <name>` | **Deprecated**, use `--file` |
 | `-V, --version` / `-h, --help` | Version / help |
 
 Command line options take precedence over the configuration file.
@@ -190,8 +189,6 @@ Example:
   ]
 }
 ```
-
-> The `directory` option and `--directory` flag are **deprecated**: use `files` and `--file`.
 
 ### `defineConfig` and `defineParameters`
 

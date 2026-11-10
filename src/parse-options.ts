@@ -39,13 +39,6 @@ const KAUKAU_OPTIONS = {
     name: 'isolate',
     type: 'isolate',
   },
-
-  // DEPRECATED
-  _DIRECTORY: {
-    name: 'directory',
-    type: 'string',
-    deprecated: true,
-  },
 } as const satisfies Record<string, KaukauOptionDefinition>;
 
 const DEFAULT_OPTIONS = {
@@ -157,14 +150,6 @@ export function parseKaukauOptions(
   const ignore: string[] = [];
   const options = (opts || {}) as RawOptions;
   const defaults = (defaultOpts || {}) as RawOptions;
-
-  // deprecated "directory" option
-  if (
-    typeof options[KAUKAU_OPTIONS.FILE.name] === 'undefined' &&
-    options[KAUKAU_OPTIONS._DIRECTORY.name]
-  ) {
-    options[KAUKAU_OPTIONS.FILE.name] = options[KAUKAU_OPTIONS._DIRECTORY.name];
-  }
 
   // "file" to "files" options
   if (

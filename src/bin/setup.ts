@@ -68,12 +68,6 @@ function setupFactory(program: Command): ((this: Command, ...args: any[]) => voi
 
     debug.debug('--config %O', configPath);
 
-    // --directory (DEPRECATED)
-    if (opts.directory) {
-      Logger.warn('"--directory" is deprecated. Use "--file" instead.');
-      options.files = [opts.directory];
-    }
-
     // --file
     if (opts.file) {
       options.files = [opts.file];

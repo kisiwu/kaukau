@@ -2,7 +2,7 @@ var { Kaukau } = require('../lib/index.cjs');
 
 var kaukau = new Kaukau(
   {
-    "directory": "test/tests",
+    "files": "test/tests",
     //"files": [
     //  "test/tests/sub2"
     //],

@@ -171,12 +171,6 @@ function startFactory(program: Command): () => Promise<void> {
       options.exitOnFail = opts.exitOnFail;
     }
 
-    // --directory (DEPRECATED)
-    if (opts.directory) {
-      Logger.warn('"--directory" is deprecated. Use "--file" instead.');
-      options.files = [opts.directory];
-    }
-
     // --file
     if (opts.file) {
       options.files = [opts.file];
