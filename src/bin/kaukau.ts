@@ -1,15 +1,14 @@
 #!/usr/bin/env node
 
-const pckg = require('../package'),
-  { Command } = require('commander'),
-  startFactory = require('./start'),
-  setupFactory = require('./setup');
+import pckg from '../../package.json' with { type: "json" };
+import { Command } from 'commander';
+import setupFactory from './setup.js';
+import startFactory from './start.js';
 
 const program = new Command();
 
 program
   .version(pckg.version)
-  .option('--directory <name>', 'folder containing the test files (DEPRECATED)')
   .option('-f, --file <name>', 'file/folder to be loaded for execution')
   .option('--debug', 'debug mode');
 
@@ -56,6 +55,8 @@ program
     'files to watch to run the tests'
   )
   .option('--ignore', 'do not watch files (overrides --watch)')
+  .option('--isolate', 'run tests in isolation')
+  .option('--no-isolate', "do not run tests in isolation")
   .action(startFactory(program));
 
 program.parse(process.argv);

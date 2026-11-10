@@ -1,4 +1,5 @@
-var expect = require('chai').expect;
+var expect = require('chai').expect; // "npm run cmd" does 5 tests
+// import { expect } from "chai"; // "npm run cmd" only does 4 tests. It skips this one at Test n° 2
 
 describe('Route 1 sub2 spec', function() {
 

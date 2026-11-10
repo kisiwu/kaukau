@@ -1,13 +1,12 @@
 {
 	"enableLogs": true,
 	"exitOnFail": false,
-	"directory": "test/tests",
-	"ext": ".js",
+	"files": "test/tests",
+	"ext": [".cjs", ".js", ".spec.mjs"],
 	"options": {
 		"bail": false,
 		"fullTrace": true,
 		"grep": "",
-		"ignoreLeaks": false,
 		"reporter": "spec",
 		"retries": 0,
 		"slow": 150,

@@ -1,12 +1,16 @@
-const Kaukau = require('../index'),
-  logger = require('@novice1/logger'),
-  debug = logger.debugger('kaukau:cmd:start'),
-  fs = require('fs'),
-  path = require('path'),
-  watch = require('./watch');
+import fs from 'node:fs';
+import path from 'node:path';
+import process from 'node:process';
+import { Logger, Debug as LoggerDebug } from '@novice1/logger';
+import type { Command } from 'commander';
+import watch from './watch.js';
+import { Kaukau } from '../kaukau.js';
+import type { IParameters, KaukauOptions } from '../options.js';
 
-function run(options) {
-  let kaukau = new Kaukau(options);
+const debug = Logger.debugger('kaukau:cmd:start');
+
+function run(options: KaukauOptions) {
+  const kaukau = new Kaukau(options);
   kaukau.run().on('done', (totalFailures) => {
     process.on('exit', function () {
       process.exit(totalFailures); // exit with non-zero status if there were failures
@@ -14,9 +18,7 @@ function run(options) {
   });
 }
 
-function listFilesRecSync(dir, filelist, subdir) {
-  subdir = subdir || '';
-  filelist = filelist || [];
+function listFilesRecSync(dir: string, filelist: string[] = [], subdir: string = '') {
   if (fs.existsSync(dir)) {
     fs.readdirSync(dir).forEach(function (file) {
       if (fs.statSync(path.join(dir, file)).isDirectory()) {
@@ -34,30 +36,28 @@ function listFilesRecSync(dir, filelist, subdir) {
 }
 
 /**
- *
- * @param {import('commander').Command} program
- * @returns {function} action
+ * Factory function to create the start action for the commander Command instance.
+ * @param program The commander Command instance
+ * @returns The action function to be used with the commander Command instance
  */
-function startFactory(program) {
+function startFactory(program: Command): () => Promise<void> {
   return async function startAction() {
-    let opts = program.opts();
+    const opts = program.opts();
 
     if (!opts.ignore && opts.watch && opts.watch.length) {
       // VERY IMPORTANT to send:
       // - files to watch
       // - updated command (--ignore)
-      /**
-       * @type {string[]}
-       */
       let args = process.argv.map(arg => arg);
-      let cmdIdx = args.findIndex( str => str.endsWith('kaukau') );
+      const cmdIdx = args.findIndex( str => str.endsWith('kaukau') );
       if (cmdIdx > -1) {
         // start args from 'kaukau' command
-        args = args.slice(cmdIdx)
+        args = args.slice(cmdIdx);
         // extract command
-        const cmd = args.shift();
+        const cmd = args.shift() as string; // we know the first argument is the command itself
         // remove --watch <globs...>
-        let watchStart = args.indexOf('--watch'), watchEnd = -1;
+        const watchStart = args.indexOf('--watch');
+        let watchEnd = -1;
         if (watchStart > -1) {
           for(let i = watchStart+1; i < args.length; i++) {
             if (args[i].startsWith('-')) {
@@ -75,17 +75,26 @@ function startFactory(program) {
       }
     }
 
-    let options = {};
+    const options: KaukauOptions = {};
 
     // --debug
     if (opts.debug) {
-      require('debug').enable('kaukau:*');
+      LoggerDebug.enable('kaukau:*');
+    }
+
+    // --isolate
+    if (opts.isolate !== undefined) {
+      options.isolate = { require: [], execArgv: [] };
     }
 
     // --require
     if (opts.require) {
-      opts.require.forEach(function (mod) {
-        debug.silly('--require', mod);
+      opts.require.forEach(function (mod: string) {
+        debug.trace('--require', mod);
+        if (options.isolate && typeof options.isolate === 'object' && Array.isArray(options.isolate.require)) {
+          debug.trace('Requiring module in isolate mode:', mod);
+          options.isolate.require.push(mod);
+        }
         require(mod);
       });
     }
@@ -93,24 +102,19 @@ function startFactory(program) {
     // --config
     if (opts.config) {
       try {
-        let fullPathConfig = path.resolve(opts.config);
+        const fullPathConfig = path.resolve(opts.config);
         debug.debug(fullPathConfig);
-        //let config = require(fullPathConfig);
-        let config = fullPathConfig.toLowerCase().endsWith('.json') ?
-        require(fullPathConfig) : 
-        (await import(
+        const config: Record<string, unknown> = (await import(
           (process.platform == 'win32' ? 'file://' : '') + 
-          fullPathConfig
-          /*
+          fullPathConfig,
           // Importing JSON modules is an experimental feature and might change at any time
           fullPathConfig.toLowerCase().endsWith('.json') ? 
-          { assert: { type: "json" } } : 
+          { with: { type: "json" } } : 
           undefined
-          */
         )).default;
-        Object.keys(config).forEach((p) => (options[p] = config[p]));
+        Object.keys(config).forEach((p) => ((options as Record<string, unknown>)[p] = config[p]));
       } catch (e) {
-        logger.error(
+        Logger.error(
           `"--config": Could not import configuration file '${opts.config}'`,
           e
         );
@@ -122,7 +126,7 @@ function startFactory(program) {
     // --parameters
     if (opts.parameters) {
       if (!fs.existsSync(opts.parameters)) {
-        logger.error(`"--parameters": Could not find '${opts.parameters}'`);
+        Logger.error(`"--parameters": Could not find '${opts.parameters}'`);
         process.exitCode = 2;
         return;
       }
@@ -135,39 +139,23 @@ function startFactory(program) {
         );
       }
 
-      /*
-      options.parameters = params.map((p) => {
-        let fullPathParam = path.resolve(p);
-        try {
-          debug.debug(fullPathParam);
-          return require(fullPathParam);
-        } catch (e) {
-          logger.error(`"--parameters": Could not import '${p}'`, e);
-          process.exit(2);
-        }
-      });
-      */
       options.parameters = []
       for (const p of params) {
-        let fullPathParam = path.resolve(p);
+        const fullPathParam = path.resolve(p);
         try {
           debug.debug(fullPathParam);
-          options.parameters.push(
-            fullPathParam.toLowerCase().endsWith('.json') ?
-              require(fullPathParam) :
-              (await import(
-                (process.platform == 'win32' ? 'file://' : '') +
-                fullPathParam
-                /*
-                // Importing JSON modules is an experimental feature and might change at any time
-                fullPathParam.toLowerCase().endsWith('.json') ? 
-                { assert: { type: "json" } } : 
+          (options.parameters as IParameters[]).push(
+            (await import(
+              (process.platform == 'win32' ? 'file://' : '') +
+              fullPathParam,
+              // Importing JSON modules is an experimental feature and might change at any time
+              fullPathParam.toLowerCase().endsWith('.json') ?
+                { with: { type: "json" } } :
                 undefined
-                */
-              )).default
+            )).default
           )
         } catch (e) {
-          logger.error(`"--parameters": Could not import '${p}'`, e);
+          Logger.error(`"--parameters": Could not import '${p}'`, e);
           process.exit(2);
         }
       }
@@ -181,12 +169,6 @@ function startFactory(program) {
     // --exit-on-fail/--no-exit-on-fail
     if (typeof opts.exitOnFail !== 'undefined') {
       options.exitOnFail = opts.exitOnFail;
-    }
-
-    // --directory (DEPRECATED)
-    if (opts.directory) {
-      logger.warn('"--directory" is deprecated. Use "--file" instead.');
-      options.files = [opts.directory];
     }
 
     // --file
@@ -203,4 +185,4 @@ function startFactory(program) {
   };
 }
 
-module.exports = startFactory;
+export default startFactory;

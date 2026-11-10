@@ -1,20 +1,4 @@
-import { MochaOptions, Suite, Test, Hook } from "mocha";
-//import { EventEmitter } from "events";
-
-declare class Kaukau {
-    constructor(config?: KaukauOptions);
-    enableLogs(): boolean;
-    exitOnFail(): boolean;
-    getFiles(): string[];
-    getMochaOptions(): MochaOptions;
-    logLevel(): LogLevel | undefined;
-    loggerOptions(): { enableLogs?: boolean, logLevel?: LogLevel };
-    /**
-     * Run tests.
-     * - https://github.com/kisiwu/kaukau?tab=readme-ov-file#programmatically
-     */
-    run(): Runner;
-}
+import type { Hook, Suite, Test } from 'mocha';
 
 // #region Runner "waiting" event
 export interface Runner {
@@ -170,48 +154,3 @@ export interface Runner extends NodeJS.EventEmitter {
     emit(name: string, ...args: any[]): boolean;
 }
 // #endregion Runner untyped events
-
-export type LogLevel = 'error' | 'warn' | 'info' | 'verbose' | 'debug' | 'silly' | number;
-
-export interface BaseOptions {
-    /**
-     * Comma (`,`) separated or array of file extensions to be loaded if files contains path to directories. Default: `['.js', '.mjs', '.cjs']`.
-     */
-    ext?: string | string[];
-    
-    /**
-     * Files and/or directories to be loaded for execution. Default: `[]`.
-     */
-    files?: string | string[];
-}
-
-export interface IParameters {
-    kaukauOptions?: BaseOptions;
-    mochaOptions?: MochaOptions;
-    [x: string]: unknown;
-}
-
-/**
- * https://github.com/kisiwu/kaukau?tab=readme-ov-file#configuration
- */
-export interface KaukauOptions extends BaseOptions {
-    /**
-     * Enable/disable kaukau logs. Default: `true`.
-     */
-    enableLogs?: boolean;
-    /**
-     * Exit after a set of tests fails so it won't execute tests for the next sets of parameters if there are some. Default: `false`.
-     */
-    exitOnFail?: boolean;
-    /**
-     * https://github.com/kisiwu/kaukau?tab=readme-ov-file#logger
-     */
-    logLevel?: LogLevel;
-    /**
-     * Options to pass to Mocha.
-     */
-    options?: MochaOptions;
-    parameters?: IParameters | IParameters[] | unknown;
-}
-
-export = Kaukau

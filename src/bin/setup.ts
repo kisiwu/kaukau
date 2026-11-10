@@ -1,10 +1,13 @@
-const logger = require('@novice1/logger'),
-  debug = logger.debugger('kaukau:cmd:setup'),
-  fs = require('fs'),
-  path = require('path'),
-  mkdir = require('mkdirp');
+import fs from 'node:fs';
+import path from 'node:path';
+import { Logger, Debug as LoggerDebug } from '@novice1/logger';
+import type { Command } from 'commander';
+import * as mkdir from 'mkdirp';
+import type { KaukauOptions } from '../options.js';
 
-function setup(configPath, options) {
+const debug = Logger.debugger('kaukau:cmd:setup');
+
+function setup(configPath: string, options: KaukauOptions) {
   // create directories
   mkdir.sync(path.dirname(configPath));
 
@@ -23,21 +26,21 @@ function setup(configPath, options) {
       fs.writeFileSync(configPath, jsonOptions);
     }
   } catch (e) {
-    logger.error(`Error --config ${configPath}`, e);
+    Logger.error(`Error --config ${configPath}`, e);
     process.exitCode = 1;
   }
 }
 
 /**
- *
- * @param {import('commander').Command} program
- * @returns {function} action
+ * Factory function to create the setup action for the commander Command instance.
+ * @param program The commander Command instance
+ * @returns The action function to be used with the commander Command instance
  */
-function setupFactory(program) {
+function setupFactory(program: Command): ((this: Command, ...args: any[]) => void | Promise<void>) {
   return function setupAction() {
     let opts = program.opts();
 
-    let options = {
+    let options: KaukauOptions = {
       enableLogs: true,
       exitOnFail: false,
       files: [],
@@ -45,7 +48,6 @@ function setupFactory(program) {
         bail: false,
         fullTrace: true,
         grep: '',
-        ignoreLeaks: true,
         reporter: 'spec',
         retries: 0,
         slow: 150,
@@ -58,7 +60,7 @@ function setupFactory(program) {
 
     // --debug
     if (opts.debug) {
-      require('debug').enable('kaukau:*');
+      LoggerDebug.enable('kaukau:*');
     }
 
     // --config
@@ -66,21 +68,15 @@ function setupFactory(program) {
 
     debug.debug('--config %O', configPath);
 
-    // --directory (DEPRECATED)
-    if (opts.directory) {
-      logger.warn('"--directory" is deprecated. Use "--file" instead.');
-      options.files = [opts.directory];
-    }
-
     // --file
     if (opts.file) {
       options.files = [opts.file];
     }
 
-    debug.debug('--file %O', options.files[0]);
+    debug.debug('--file %O', options.files?.[0]);
 
     setup(configPath, options);
   };
 }
 
-module.exports = setupFactory;
+export default setupFactory;
