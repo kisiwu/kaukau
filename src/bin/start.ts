@@ -49,7 +49,7 @@ function startFactory(program: Command): () => Promise<void> {
       // - files to watch
       // - updated command (--ignore)
       let args = process.argv.map(arg => arg);
-      const cmdIdx = args.findIndex( str => str.endsWith('kaukau') );
+      const cmdIdx = args.findIndex( str => str.endsWith('kaukau') || str.endsWith('kaukau.js') || str.endsWith('kaukau.cjs') );
       if (cmdIdx > -1) {
         // start args from 'kaukau' command
         args = args.slice(cmdIdx);
