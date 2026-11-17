@@ -46,6 +46,9 @@ program
   .option('-r, --require <names>', 'require modules', function (value) {
     return value.split(',');
   })
+  .option('--import <names>', 'import modules', function (value) {
+    return value.split(',');
+  })
   .option('--logs', 'enable logs')
   .option('--no-logs', 'disable logs')
   .option('--exit-on-fail', 'exit after the first set of tests that has a fail')

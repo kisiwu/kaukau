@@ -99,6 +99,18 @@ function startFactory(program: Command): () => Promise<void> {
       });
     }
 
+    // --import
+    if (opts.import) {
+      for (const mod of opts.import) {
+        debug.trace('--import', mod);
+        if (options.isolate && typeof options.isolate === 'object' && Array.isArray(options.isolate.require)) {
+          debug.trace('Importing module in isolate mode:', mod);
+          options.isolate.require.push(mod);
+        }
+        await import(mod);
+      }
+    }
+
     // --config
     if (opts.config) {
       try {
